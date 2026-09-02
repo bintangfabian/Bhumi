@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-hanken), sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Palette: charcoal + lime, from the Bhumi mark ---- */
+  --color-page: #f6f6f3;
+  --color-surface: #ffffff;
+  --color-ink: #201f1d;
+  --color-ink-2: #444142; /* secondary */
+  --color-ink-3: #6f6c68;
+  --color-line: #e4e3dd;
+  --color-line-2: #d3d2ca;
+
+  --color-lime: #e4e422;
+  --color-lime-deep: #c9ca10;
+  --color-lime-wash: #f4f4cf;
+
+  --color-carbon: #201f1d; /* inverted surfaces */
+  --color-carbon-2: #2c2b28;
+  --color-on-carbon: #f2f2ec;
+
+  --color-alert: #b23b26;
+  --color-alert-wash: #f6e4df;
+
+  /* ---- Shape: cards top out at 12px; pills for tags/buttons only ---- */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+
+  /* One elevation token, used only on genuinely floating layers (no border) */
+  --shadow-float: 0 10px 30px -8px rgba(32, 31, 29, 0.22);
+}
+
+@layer base {
+  html {
+    background: var(--color-page);
+  }
+  body {
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  /* Flat placeholder for not-yet-shot imagery — no stripes, no gradient */
+  .figure {
+    background-color: #e6e3d8;
+  }
+  .figure-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+
+  /* Micro label — used sparingly, only for genuine kicker labels */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+}
