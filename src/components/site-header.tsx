@@ -8,8 +8,8 @@ import { Logo } from "@/components/logo";
 import { ButtonLink, Container } from "@/components/ui";
 
 const NAV = [
-  { href: "/", label: "Katalog", match: (p: string) => p === "/" },
-  { href: "/#cara", label: "Cara Kerja", match: () => false },
+  { href: "/katalog", label: "Katalog", match: (p: string) => p.startsWith("/katalog") || p.startsWith("/paket") },
+  { href: "/cara-kerja", label: "Cara Kerja", match: (p: string) => p.startsWith("/cara-kerja") },
   { href: "/kebun", label: "Kebun Saya", match: (p: string) => p.startsWith("/kebun") },
 ];
 

@@ -18,7 +18,7 @@ export default function CartPage() {
       {items.length === 0 ? (
         <div className="mt-8 border border-dashed border-line-2 px-6 py-16 text-center">
           <p className="text-[15px] text-ink-2">Keranjang kamu masih kosong.</p>
-          <ButtonLink href="/#katalog" variant="primary" className="mt-5">
+          <ButtonLink href="/katalog" variant="primary" className="mt-5">
             Lihat katalog paket
           </ButtonLink>
         </div>

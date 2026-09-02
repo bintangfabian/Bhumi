@@ -4,6 +4,40 @@
 
 export type Level = "Pemula" | "Menengah" | "Mahir";
 
+/**
+ * Placeholder photography, curated Unsplash shots of home vegetable growing.
+ * Swap for real product photos later. `unsplash()` builds a sized CDN URL;
+ * `photo()` picks deterministically from the pool so a given seed is stable.
+ */
+export function unsplash(id: string, w = 900) {
+  return `https://images.unsplash.com/photo-${id}?w=${w}&q=70&auto=format&fit=crop`;
+}
+
+const PHOTO_POOL = [
+  "1466692476868-aef1dfb1e735", // seedlings in a seed tray
+  "1471194402529-8e0f5a675de6", // cherry tomatoes ripening on the vine
+  "1518006959466-0db0b6b4c1d0", // red chillies on the plant
+  "1591857177593-aec16c2d8f60", // young staked tomato plant in a bed
+  "1592841200221-a6898f307baa", // roma tomatoes on the plant, sunny
+  "1615671524827-c1fe3973b648", // hand holding a seedling over trays
+  "1629282980228-46b85d221086", // tending potted plants on a patio
+  "1637795257839-896afee861fd", // potted chilli plants on a shelf
+  "1649255756520-923ff309df99", // seedlings in peat pots
+  "1650223154381-cef156da1851", // pepper seedlings in tray cells
+  "1650223154483-ccdef5d0e19d", // chilli seedlings on a windowsill
+  "1686278895718-26a2331d7297", // tomatoes on the vine
+  "1710663497561-b98b13c09aeb", // chilli plant in flower with small fruit
+  "1745063537934-e6bf484d72eb", // watering can and pots on a balcony
+  "1770982698901-defbee226738", // green chillies hanging on the plant
+  "1777383504207-8aa285dd2f20", // raised planters on a patio
+];
+
+export function photo(seed: string, lock: number, w = 900) {
+  let h = lock * 2654435761;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
+  return unsplash(PHOTO_POOL[Math.abs(h) % PHOTO_POOL.length], w);
+}
+
 export type Pack = {
   id: string;
   name: string;
@@ -15,6 +49,7 @@ export type Pack = {
   priceValue: number;
   isNew: boolean;
   imgLabel: string;
+  photo: string;
   isi: string[];
 };
 
@@ -30,6 +65,7 @@ export const PACKS: Pack[] = [
     priceValue: 89000,
     isNew: false,
     imgLabel: "foto paket cabai rawit",
+    photo: unsplash("1518006959466-0db0b6b4c1d0"),
     isi: ["Bibit F1", "Pupuk organik", "5 polybag", "Sekop + sarung tangan"],
   },
   {
@@ -43,6 +79,7 @@ export const PACKS: Pack[] = [
     priceValue: 95000,
     isNew: true,
     imgLabel: "foto paket tomat cherry",
+    photo: unsplash("1471194402529-8e0f5a675de6"),
     isi: ["Bibit unggul", "Pupuk NPK", "5 polybag", "Ajir + tali"],
   },
   {
@@ -56,6 +93,7 @@ export const PACKS: Pack[] = [
     priceValue: 159000,
     isNew: true,
     imgLabel: "foto paket duo",
+    photo: unsplash("1777383504207-8aa285dd2f20"),
     isi: ["2 jenis bibit", "Pupuk organik", "8 polybag", "Set alat dasar"],
   },
   {
@@ -69,6 +107,7 @@ export const PACKS: Pack[] = [
     priceValue: 105000,
     isNew: false,
     imgLabel: "foto paket cabai keriting",
+    photo: unsplash("1637795257839-896afee861fd"),
     isi: ["Bibit hibrida", "Pupuk kandang", "6 polybag", "Gunting pangkas"],
   },
   {
@@ -82,6 +121,7 @@ export const PACKS: Pack[] = [
     priceValue: 119000,
     isNew: false,
     imgLabel: "foto paket tomat beef",
+    photo: unsplash("1592841200221-a6898f307baa"),
     isi: ["Bibit beef", "Pupuk cair", "6 polybag", "Ajir bambu"],
   },
   {
@@ -95,6 +135,7 @@ export const PACKS: Pack[] = [
     priceValue: 135000,
     isNew: false,
     imgLabel: "foto paket cabai gendot",
+    photo: unsplash("1710663497561-b98b13c09aeb"),
     isi: ["Bibit lokal", "Media tanam khusus", "4 polybag", "Termometer tanah"],
   },
 ];
@@ -126,21 +167,22 @@ type GuideStep = {
   title: string;
   desc: string;
   img: string;
+  photo: string;
   tasks: number;
 };
 
 const GUIDE_LIB: Record<"cabai" | "tomat", GuideStep[]> = {
   cabai: [
-    { no: 1, range: "Hari 1 – 14", title: "Semai benih", desc: "Rendam benih, tanam di tray semai, jaga kelembapan sampai muncul dua daun sejati.", img: "foto: tray semai berisi bibit", tasks: 4 },
-    { no: 2, range: "Hari 15 – 28", title: "Pindah tanam", desc: "Pindahkan bibit terkuat ke polybag pada sore hari, lalu siram sampai lembap merata.", img: "foto: bibit dipindah ke polybag", tasks: 3 },
-    { no: 3, range: "Hari 29 – 65", title: "Perawatan & pemupukan", desc: "Siram rutin, pangkas tunas air, pupuk tiap dua minggu, dan cek hama pada balik daun.", img: "foto: tanaman cabai berbunga", tasks: 6 },
-    { no: 4, range: "Hari 66 – 75", title: "Panen", desc: "Petik saat warna merata dan tangkai mudah lepas. Panen berulang tiap 3–5 hari.", img: "foto: cabai merah siap panen", tasks: 3 },
+    { no: 1, range: "Hari 1 – 14", title: "Semai benih", desc: "Rendam benih, tanam di tray semai, jaga kelembapan sampai muncul dua daun sejati.", img: "foto: tray semai berisi bibit", photo: unsplash("1466692476868-aef1dfb1e735"), tasks: 4 },
+    { no: 2, range: "Hari 15 – 28", title: "Pindah tanam", desc: "Pindahkan bibit terkuat ke polybag pada sore hari, lalu siram sampai lembap merata.", img: "foto: bibit dipindah ke polybag", photo: unsplash("1650223154381-cef156da1851"), tasks: 3 },
+    { no: 3, range: "Hari 29 – 65", title: "Perawatan & pemupukan", desc: "Siram rutin, pangkas tunas air, pupuk tiap dua minggu, dan cek hama pada balik daun.", img: "foto: tanaman cabai berbunga", photo: unsplash("1710663497561-b98b13c09aeb"), tasks: 6 },
+    { no: 4, range: "Hari 66 – 75", title: "Panen", desc: "Petik saat warna merata dan tangkai mudah lepas. Panen berulang tiap 3–5 hari.", img: "foto: cabai merah siap panen", photo: unsplash("1518006959466-0db0b6b4c1d0"), tasks: 3 },
   ],
   tomat: [
-    { no: 1, range: "Hari 1 – 12", title: "Semai benih", desc: "Semai di tray, tempatkan di area teduh terang, semprot air dua kali sehari.", img: "foto: benih tomat baru berkecambah", tasks: 4 },
-    { no: 2, range: "Hari 13 – 26", title: "Pindah tanam", desc: "Pindahkan ke polybag besar dan tancapkan ajir sejak awal agar akar tidak terganggu.", img: "foto: bibit tomat dengan ajir", tasks: 4 },
-    { no: 3, range: "Hari 27 – 60", title: "Perawatan & pengikatan", desc: "Ikat batang ke ajir, buang tunas samping, dan beri pupuk kalsium saat mulai berbunga.", img: "foto: tomat hijau di tangkai", tasks: 6 },
-    { no: 4, range: "Hari 61 – 70", title: "Panen", desc: "Petik saat buah kemerahan penuh. Panen bertahap agar tangkai lain ikut matang.", img: "foto: tomat cherry matang", tasks: 3 },
+    { no: 1, range: "Hari 1 – 12", title: "Semai benih", desc: "Semai di tray, tempatkan di area teduh terang, semprot air dua kali sehari.", img: "foto: benih tomat baru berkecambah", photo: unsplash("1649255756520-923ff309df99"), tasks: 4 },
+    { no: 2, range: "Hari 13 – 26", title: "Pindah tanam", desc: "Pindahkan ke polybag besar dan tancapkan ajir sejak awal agar akar tidak terganggu.", img: "foto: bibit tomat dengan ajir", photo: unsplash("1591857177593-aec16c2d8f60"), tasks: 4 },
+    { no: 3, range: "Hari 27 – 60", title: "Perawatan & pengikatan", desc: "Ikat batang ke ajir, buang tunas samping, dan beri pupuk kalsium saat mulai berbunga.", img: "foto: tomat hijau di tangkai", photo: unsplash("1686278895718-26a2331d7297"), tasks: 6 },
+    { no: 4, range: "Hari 61 – 70", title: "Panen", desc: "Petik saat buah kemerahan penuh. Panen bertahap agar tangkai lain ikut matang.", img: "foto: tomat cherry matang", photo: unsplash("1592841200221-a6898f307baa"), tasks: 3 },
   ],
 };
 
@@ -148,7 +190,7 @@ export type PackDetail = Pack & {
   harvestRange: string;
   effort: string;
   sun: string;
-  thumbs: string[];
+  thumbs: { label: string; photo: string }[];
   kit: KitItem[];
   guide: GuideStep[];
 };
@@ -162,7 +204,11 @@ export function buildDetail(p: Pack): PackDetail {
     harvestRange: `${p.days - 8}–${p.days + 7} hari`,
     effort: "10 mnt/hari",
     sun: "5–6 jam",
-    thumbs: ["foto: isi paket lengkap", "foto: kartu panduan", "foto: hasil panen"],
+    thumbs: [
+      { label: "foto: isi paket lengkap", photo: photo("gardening,kit,tools", p.days) },
+      { label: "foto: kartu panduan", photo: photo("notebook,plant,guide", p.days + 1) },
+      { label: "foto: hasil panen", photo: photo(isTomat ? "tomato,basket" : "chili,basket", p.days + 2) },
+    ],
     kit,
     guide,
   };

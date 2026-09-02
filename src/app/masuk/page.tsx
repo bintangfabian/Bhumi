@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-[13px] text-ink-3">
         Belum punya akun?{" "}
-        <Link href="/#katalog" className="font-semibold text-ink underline">
+        <Link href="/katalog" className="font-semibold text-ink underline">
           Mulai dari katalog
         </Link>
       </p>

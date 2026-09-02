@@ -2,8 +2,8 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { JOURNAL, PANDUAN, PROGRESS_PHOTOS } from "@/lib/data";
-import { Button, Container, Figure, ProgressBar } from "@/components/ui";
+import { JOURNAL, PANDUAN, PROGRESS_PHOTOS, photo } from "@/lib/data";
+import { Button, Container, Photo, ProgressBar } from "@/components/ui";
 
 export default function PanduanPage({
   params,
@@ -163,12 +163,19 @@ export default function PanduanPage({
               Satu foto per minggu memperlihatkan perubahan tanaman.
             </p>
             <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
-              {PROGRESS_PHOTOS.map((date) => (
-                <Figure key={date} ratio="1 / 1" className="w-full border border-line">
-                  <span className="absolute bottom-1.5 left-1.5 font-mono text-[10px] uppercase text-ink-3">
+              {PROGRESS_PHOTOS.map((date, i) => (
+                <Photo
+                  key={date}
+                  src={photo("chili,seedling,pot", 50 + i)}
+                  alt={`Perkembangan ${date}`}
+                  ratio="1 / 1"
+                  className="border border-line"
+                  sizes="120px"
+                >
+                  <span className="absolute bottom-1.5 left-1.5 bg-carbon/70 px-1 font-mono text-[10px] uppercase text-on-carbon">
                     {date}
                   </span>
-                </Figure>
+                </Photo>
               ))}
               <button className="grid aspect-square place-items-center gap-1 border border-dashed border-line-2 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3 hover:border-ink hover:text-ink">
                 <span className="text-[16px] leading-none">+</span>
@@ -204,7 +211,13 @@ export default function PanduanPage({
                     {j.text}
                   </span>
                   {j.photo && (
-                    <Figure ratio="1 / 1" className="w-9 shrink-0 border border-line" />
+                    <Photo
+                      src={photo("chili,plant,leaf", 60 + i)}
+                      alt={`Foto jurnal ${j.date}`}
+                      ratio="1 / 1"
+                      className="w-9 shrink-0 border border-line"
+                      sizes="40px"
+                    />
                   )}
                 </li>
               ))}
@@ -233,10 +246,12 @@ export default function PanduanPage({
           <div className="mt-8 space-y-8">
             {stage.body.map((b, i) => (
               <div key={b.h}>
-                <Figure
-                  label={b.img}
+                <Photo
+                  src={photo("chili,plant,gardening", stage.no * 10 + i)}
+                  alt={b.h}
                   ratio="16 / 9"
-                  className="w-full border border-line"
+                  className="border border-line"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
                 />
                 <h3 className="mt-3 flex gap-2 text-[16px]">
                   <span className="font-mono text-ink-3">

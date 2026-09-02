@@ -1,274 +1,171 @@
-"use client";
-
-import { useMemo, useState } from "react";
 import Link from "next/link";
-import { DIFFS, DURS, PACKS, SORTS, type Level, type SortBy } from "@/lib/data";
-import { ButtonLink, Container, Figure, LevelBadge } from "@/components/ui";
+import { ButtonLink, Container, Photo } from "@/components/ui";
+import { unsplash } from "@/lib/data";
 
-const STEPS = [
+const SYSTEM = [
   {
-    n: "01",
-    title: "Pilih paketnya",
-    body: "Saring berdasarkan tingkat kesulitan dan lama panen. Isi tiap paket tertulis lengkap sebelum kamu bayar.",
+    k: "Panduan bertahap",
+    d: "Materi terbagi jadi 4–6 tahap yang terbuka otomatis sesuai umur tanaman. Kamu tidak dibanjiri semua instruksi sekaligus.",
   },
   {
-    n: "02",
-    title: "Paket datang lengkap",
-    body: "Bibit, media tanam, pupuk, polybag, dan alat dasar dikirim dalam satu kotak siap pakai.",
+    k: "Checklist & pengingat harian",
+    d: "Tugas seperti siram, pupuk, dan cek hama muncul di dashboard pada harinya, lengkap dengan hitungan yang sudah selesai.",
   },
   {
-    n: "03",
-    title: "Dipandu tiap tahap",
-    body: "Kebun Saya membuka panduan sesuai umur tanaman, mengingatkan tugas harian, dan menyimpan catatanmu.",
+    k: "Jurnal foto perkembangan",
+    d: "Unggah satu foto per minggu. Bhumi menyusunnya jadi linimasa supaya perubahan tanaman terlihat jelas.",
+  },
+  {
+    k: "Pendamping saat mentok",
+    d: "Kalau ada yang tidak sesuai panduan, kirim pertanyaan langsung dari halaman tahap yang sedang kamu kerjakan.",
   },
 ];
 
-export default function CatalogPage() {
-  const [diff, setDiff] = useState<Level | "Semua">("Semua");
-  const [dur, setDur] = useState<string>("Semua");
-  const [sortBy, setSortBy] = useState<SortBy>("Panen tercepat");
+const STATS = [
+  { v: "6", l: "paket siap tanam" },
+  { v: "4–6", l: "tahap panduan per tanaman" },
+  { v: "70+", l: "hari didampingi sampai panen" },
+];
 
-  const packs = useMemo(() => {
-    const durDef = DURS.find((d) => d.label === dur) ?? DURS[0];
-    let list = PACKS.filter(
-      (p) => (diff === "Semua" || p.level === diff) && durDef.test(p.days),
-    );
-    if (sortBy === "Panen tercepat") list = [...list].sort((a, b) => a.days - b.days);
-    else if (sortBy === "Harga terendah")
-      list = [...list].sort((a, b) => a.priceValue - b.priceValue);
-    return list;
-  }, [diff, dur, sortBy]);
-
+export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <Container className="grid items-end gap-10 pb-14 pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:pb-20 lg:pt-20">
+      <Container className="grid items-center gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
         <div>
-          <h1 className="text-[clamp(34px,5.5vw,52px)] leading-[1.02]">
-            Panen pertama,
+          <h1 className="text-[clamp(34px,5.5vw,54px)] leading-[1.01]">
+            Bertani di rumah,
             <br />
-            tanpa nebak-nebak.
+            tanpa berhenti di tengah.
           </h1>
-          <p className="mt-6 max-w-[52ch] text-[17px] leading-relaxed text-ink-2">
-            Bibit, media tanam, dan alat dikirim lengkap ke rumah. Panduan
-            digital menemani kamu dari semai sampai panen, satu tahap sekali,
-            lewat dashboard Kebun Saya.
+          <p className="mt-6 max-w-[50ch] text-[17px] leading-relaxed text-ink-2">
+            Bhumi mengirim paket bertani yang lengkap, lalu mendampingimu lewat
+            panduan digital sampai panen pertama. Dibuat untuk pemula dan rumah
+            tanpa lahan luas.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href="#katalog" variant="primary">
+            <ButtonLink href="/katalog" variant="primary">
               Lihat katalog
             </ButtonLink>
-            <ButtonLink href="#cara" variant="ghost">
-              Cara kerjanya
+            <ButtonLink href="/cara-kerja" variant="ghost">
+              Cara kerja
             </ButtonLink>
           </div>
-          <p className="mt-8 font-mono text-[13px] uppercase tracking-[0.08em] text-ink-3">
-            6 paket &nbsp;·&nbsp; 4 tahap panduan &nbsp;·&nbsp; 70+ hari didampingi
-          </p>
         </div>
 
-        <Figure
-          label="foto: tangan memegang polybag cabai"
+        <Photo
+          src={unsplash("1629282980228-46b85d221086", 1200)}
+          alt="Merawat tanaman dalam pot di teras rumah"
           ratio="4 / 3"
-          className="w-full border border-line"
+          className="border border-line"
+          sizes="(max-width: 1024px) 100vw, 45vw"
+          priority
         />
       </Container>
 
-      {/* How it works */}
-      <section id="cara" className="border-y border-line bg-surface">
-        <Container className="py-16 lg:py-20">
-          <div className="max-w-[46ch]">
-            <span className="kicker">Cara kerja</span>
-            <h2 className="mt-3 text-[clamp(24px,3.5vw,34px)]">
-              Tiga langkah sampai panen
+      {/* The problem it solves */}
+      <section className="border-y border-line bg-surface">
+        <Container className="py-16 lg:py-24">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <h2 className="text-[clamp(24px,3.5vw,36px)] leading-tight">
+              Kebanyakan orang berhenti di minggu ketiga.
             </h2>
-            <p className="mt-3 text-ink-2">
-              Tidak perlu pengalaman. Panduannya mengurai satu tahap pada satu
-              waktu.
-            </p>
+            <div className="max-w-[60ch] space-y-4 text-[16px] leading-relaxed text-ink-2">
+              <p>
+                Beli bibit, tanam, lalu bingung. Kapan pindah polybag, seberapa
+                sering pupuk, kenapa daun menguning. Panduan yang ada biasanya
+                umum dan tidak menyesuaikan kondisi tanamanmu.
+              </p>
+              <p>
+                Bhumi menutup jarak itu. Paketnya sudah pas takarannya, dan
+                dashboard Kebun Saya memberi tahu apa yang perlu dilakukan hari
+                ini, bukan sebulan lagi.
+              </p>
+            </div>
           </div>
-
-          <ol className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-3">
-            {STEPS.map((s) => (
-              <li key={s.n} className="border-t-2 border-ink pt-4">
-                <span className="font-mono text-[13px] font-medium text-ink-3">
-                  {s.n}
-                </span>
-                <h3 className="mt-3 text-[19px]">{s.title}</h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-ink-2">
-                  {s.body}
-                </p>
-              </li>
-            ))}
-          </ol>
         </Container>
       </section>
 
-      {/* Catalog */}
-      <Container id="katalog" className="py-16 lg:py-20">
-        <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <div className="max-w-[44ch]">
-            <span className="kicker">Katalog</span>
-            <h2 className="mt-3 text-[clamp(24px,3.5vw,34px)]">Paket bertani</h2>
-            <p className="mt-3 text-ink-2">
-              Mulai dari cabai dan tomat, tanaman paling ramah untuk pemula.
+      {/* System / how it accompanies you */}
+      <Container className="py-16 lg:py-24">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <span className="kicker">Kebun Saya</span>
+            <h2 className="mt-3 text-[clamp(24px,3.5vw,34px)]">
+              Dashboard yang mendampingi tiap hari
+            </h2>
+            <p className="mt-3 max-w-[46ch] text-[15px] leading-relaxed text-ink-2">
+              Setiap paket yang kamu beli otomatis masuk ke Kebun Saya. Dari
+              sana kamu menjalankan panduannya, satu tahap sekali.
             </p>
+            <Photo
+              src={unsplash("1615671524827-c1fe3973b648", 1000)}
+              alt="Memindahkan bibit dari tray semai"
+              ratio="16 / 11"
+              className="mt-6 border border-line"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
-          <label className="flex items-center gap-2 text-[13px] text-ink-3">
-            Urutkan
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortBy)}
-              className="h-9 border border-line-2 bg-surface px-2.5 text-[13px] font-medium text-ink"
-            >
-              {SORTS.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
-          </label>
-        </div>
 
-        {/* Filters */}
-        <div className="mt-8 flex flex-col gap-4 border-y border-line py-5 sm:flex-row sm:items-center sm:gap-10">
-          <FilterRow
-            label="Tingkat"
-            options={DIFFS}
-            active={diff}
-            onSelect={(v) => setDiff(v as Level | "Semua")}
-          />
-          <FilterRow
-            label="Durasi"
-            options={DURS.map((d) => d.label)}
-            active={dur}
-            onSelect={setDur}
-          />
-        </div>
-
-        <div className="mt-4 font-mono text-[12px] uppercase tracking-[0.08em] text-ink-3">
-          {packs.length} dari {PACKS.length} paket
-        </div>
-
-        {packs.length === 0 ? (
-          <div className="mt-6 border border-dashed border-line-2 px-6 py-16 text-center">
-            <h3 className="text-[18px]">Belum ada paket yang cocok</h3>
-            <p className="mx-auto mt-2 max-w-[40ch] text-[14px] text-ink-2">
-              Coba lepas salah satu filter untuk melihat pilihan lain.
-            </p>
-            <button
-              onClick={() => {
-                setDiff("Semua");
-                setDur("Semua");
-              }}
-              className="mt-5 h-9 border border-line-2 bg-surface px-4 text-[13px] font-semibold text-ink hover:border-ink"
-            >
-              Reset filter
-            </button>
-          </div>
-        ) : (
-          <div className="mt-6 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-            {packs.map((p) => (
-              <article
-                key={p.id}
-                className="group flex flex-col bg-surface transition-colors hover:bg-page"
-              >
-                <div className="relative border-b border-line">
-                  <Figure label={p.imgLabel} ratio="4 / 3" className="w-full" />
-                  <div className="absolute left-3 top-3 flex gap-2">
-                    <LevelBadge level={p.level} />
-                    {p.isNew && (
-                      <span className="bg-lime px-2 py-1 font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
-                        Baru
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-[18px] leading-snug">{p.name}</h3>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">
-                    {p.tagline}
+          <ol className="divide-y divide-line border-y border-line">
+            {SYSTEM.map((f, i) => (
+              <li key={f.k} className="flex gap-5 py-6">
+                <span className="font-mono text-[13px] text-ink-3">
+                  0{i + 1}
+                </span>
+                <div>
+                  <h3 className="text-[17px]">{f.k}</h3>
+                  <p className="mt-1.5 max-w-[52ch] text-[14px] leading-relaxed text-ink-2">
+                    {f.d}
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {p.isi.map((item) => (
-                      <span
-                        key={item}
-                        className="border border-line px-2 py-0.5 text-[11.5px] text-ink-3"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                  <dl className="mt-4 flex gap-6 border-t border-line pt-3 font-mono text-[12px] text-ink-3">
-                    <div>
-                      <dt className="sr-only">Hari ke panen</dt>
-                      <dd>
-                        <span className="text-ink">{p.days}</span> hari
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="sr-only">Tahap panduan</dt>
-                      <dd>
-                        <span className="text-ink">{p.stages}</span> tahap
-                      </dd>
-                    </div>
-                  </dl>
-                  <div className="mt-5 flex items-end justify-between gap-3 pt-1">
-                    <div>
-                      <div className="font-mono text-[18px] font-medium text-ink">
-                        {p.price}
-                      </div>
-                      <div className="text-[11.5px] text-ink-3">
-                        termasuk panduan
-                      </div>
-                    </div>
-                    <Link
-                      href={`/paket/${p.id}`}
-                      className="h-10 shrink-0 border border-ink bg-surface px-4 text-[13px] font-semibold leading-[38px] text-ink transition-colors group-hover:bg-ink group-hover:text-on-carbon"
-                    >
-                      Lihat paket
-                    </Link>
-                  </div>
                 </div>
-              </article>
+              </li>
             ))}
+          </ol>
+        </div>
+      </Container>
+
+      {/* Stat band */}
+      <section className="border-y border-line bg-surface">
+        <Container className="py-12">
+          <dl className="grid gap-px border border-line bg-line sm:grid-cols-3">
+            {STATS.map((s) => (
+              <div key={s.l} className="bg-surface p-6">
+                <dd className="font-display text-[32px] font-bold leading-none">
+                  {s.v}
+                </dd>
+                <dt className="mt-2 text-[13px] text-ink-3">{s.l}</dt>
+              </div>
+            ))}
+          </dl>
+        </Container>
+      </section>
+
+      {/* CTA */}
+      <Container className="py-16 lg:py-20">
+        <div className="flex flex-col gap-6 bg-carbon p-8 text-on-carbon sm:flex-row sm:items-center sm:justify-between lg:p-12">
+          <div>
+            <h2 className="text-[clamp(22px,3vw,30px)] text-on-carbon">
+              Mulai dari satu tanaman
+            </h2>
+            <p className="mt-2 max-w-[44ch] text-[14px] leading-relaxed text-on-carbon/70">
+              Pilih cabai atau tomat, paket datang lengkap, panduannya jalan
+              sejak hari pertama.
+            </p>
           </div>
-        )}
+          <div className="flex gap-3">
+            <ButtonLink href="/katalog" variant="primary">
+              Lihat katalog
+            </ButtonLink>
+            <Link
+              href="/cara-kerja"
+              className="inline-flex h-11 items-center border border-white/25 px-5 text-[14px] font-semibold text-on-carbon transition-colors hover:border-lime hover:text-lime"
+            >
+              Cara kerja
+            </Link>
+          </div>
+        </div>
       </Container>
     </>
-  );
-}
-
-function FilterRow({
-  label,
-  options,
-  active,
-  onSelect,
-}: {
-  label: string;
-  options: readonly string[];
-  active: string;
-  onSelect: (v: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-3">
-        {label}
-      </span>
-      {options.map((opt) => {
-        const on = active === opt;
-        return (
-          <button
-            key={opt}
-            onClick={() => onSelect(opt)}
-            className={`h-8 rounded-sm border px-3 text-[13px] font-medium transition-colors ${
-              on
-                ? "border-ink bg-lime text-ink"
-                : "border-line-2 bg-surface text-ink-3 hover:border-ink hover:text-ink"
-            }`}
-          >
-            {opt}
-          </button>
-        );
-      })}
-    </div>
   );
 }

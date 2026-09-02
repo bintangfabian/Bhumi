@@ -5,8 +5,8 @@ const COLS = [
   {
     head: "Belanja",
     links: [
-      { label: "Katalog paket", href: "/" },
-      { label: "Cara kerja", href: "/#cara" },
+      { label: "Katalog paket", href: "/katalog" },
+      { label: "Cara kerja", href: "/cara-kerja" },
       { label: "Keranjang", href: "/keranjang" },
     ],
   },

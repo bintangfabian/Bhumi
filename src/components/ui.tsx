@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import type { Level } from "@/lib/data";
@@ -86,6 +87,46 @@ export function Figure({
       {label ? (
         <span className="figure-label px-2 text-center">{label}</span>
       ) : null}
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Real (placeholder) photo. Sits on a Figure ground so a slow or failed load
+ * degrades to the flat swatch rather than a broken-image box.
+ */
+export function Photo({
+  src,
+  alt,
+  ratio = "4 / 3",
+  className = "",
+  sizes = "(max-width: 768px) 100vw, 33vw",
+  priority,
+  children,
+}: {
+  src: string;
+  alt: string;
+  ratio?: string;
+  className?: string;
+  sizes?: string;
+  priority?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      className={`figure relative overflow-hidden ${className}`}
+      style={{ aspectRatio: ratio }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        unoptimized
+        className="object-cover"
+      />
       {children}
     </div>
   );

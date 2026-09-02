@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { GARDEN_SUMMARY, PLANTS, TASKS, WEEK_REMINDERS } from "@/lib/data";
-import { ButtonLink, Container, ProgressBar } from "@/components/ui";
+import { GARDEN_SUMMARY, PLANTS, TASKS, WEEK_REMINDERS, photo } from "@/lib/data";
+import { ButtonLink, Container, Photo, ProgressBar } from "@/components/ui";
 
 export default function KebunPage() {
   const [done, setDone] = useState<string[]>(
@@ -34,7 +34,7 @@ export default function KebunPage() {
             2 tanaman aktif &nbsp;·&nbsp; {pending} tugas menunggu hari ini
           </p>
         </div>
-        <ButtonLink href="/#katalog" variant="ghost" size="sm">
+        <ButtonLink href="/katalog" variant="ghost" size="sm">
           + Tambah tanaman
         </ButtonLink>
       </div>
@@ -46,9 +46,21 @@ export default function KebunPage() {
           <div className="mt-4 space-y-4">
             {plants.map((pl) => (
               <article key={pl.id} className="border border-line bg-surface p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2.5">
+                <div className="flex items-start gap-4">
+                  <Photo
+                    src={photo(
+                      pl.name.toLowerCase().includes("tomat")
+                        ? "tomato,seedling,pot"
+                        : "chili,seedling,pot",
+                      pl.day,
+                    )}
+                    alt={pl.name}
+                    ratio="1 / 1"
+                    className="w-14 shrink-0 border border-line"
+                    sizes="64px"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <h3 className="text-[17px]">{pl.name}</h3>
                       <span
                         className={`inline-flex items-center gap-1.5 border px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.06em] ${

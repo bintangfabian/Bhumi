@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PACKS, buildDetail, getPack } from "@/lib/data";
-import { Container, Figure, LevelBadge, Meta } from "@/components/ui";
+import { Container, Figure, LevelBadge, Meta, Photo } from "@/components/ui";
 import { BuyBar } from "./buy-bar";
 
 export function generateStaticParams() {
@@ -27,7 +27,7 @@ export default async function PackDetailPage({
   return (
     <Container className="py-10 lg:py-14">
       <nav className="flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.06em] text-ink-3">
-        <Link href="/#katalog" className="hover:text-ink">
+        <Link href="/katalog" className="hover:text-ink">
           Katalog
         </Link>
         <span>/</span>
@@ -37,14 +37,23 @@ export default async function PackDetailPage({
       <div className="mt-8 grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
         {/* Gallery */}
         <div className="grid gap-2 lg:sticky lg:top-24">
-          <Figure label={d.imgLabel} ratio="4 / 3" className="w-full border border-line" />
+          <Photo
+            src={d.photo}
+            alt={d.name}
+            ratio="4 / 3"
+            className="border border-line"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            priority
+          />
           <div className="grid grid-cols-3 gap-2">
             {d.thumbs.map((t) => (
-              <Figure
-                key={t}
-                label={t}
+              <Photo
+                key={t.label}
+                src={t.photo}
+                alt={t.label}
                 ratio="1 / 1"
-                className="w-full border border-line"
+                className="border border-line"
+                sizes="30vw"
               />
             ))}
           </div>
@@ -134,10 +143,12 @@ export default async function PackDetailPage({
                 <span>0{g.no}</span>
                 <span>{g.range}</span>
               </div>
-              <Figure
-                label={g.img}
+              <Photo
+                src={g.photo}
+                alt={g.title}
                 ratio="16 / 10"
-                className="mt-3 w-full border border-line"
+                className="mt-3 border border-line"
+                sizes="(max-width: 640px) 100vw, 25vw"
               />
               <h3 className="mt-3 text-[16px]">{g.title}</h3>
               <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">
