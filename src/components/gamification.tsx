@@ -10,6 +10,7 @@ import {
   RING_DAYS,
   STREAK_LABEL,
   type BadgeIconKey,
+  type BadgeState,
   type Health,
   type MilestoneBadge,
   type StageUnlock,
@@ -121,11 +122,83 @@ export function ShieldIcon({ size = 14, className = "" }: { size?: number; class
 }
 
 /* =====================================================================
- * Milestone badge — three states.
- *   locked : thin grey outline, faint icon, name stays readable
+ * Milestone badge — three states, always an octagon (deck slide 02/03).
+ *   locked : 1px grey outline, faint icon, name stays readable
  *   earned : solid charcoal, lime icon, date earned
- *   new    : thin lime ring outside, lives 48h on the dashboard
+ *   new    : lime ring hugging the tile, pale wash outside it; 48h only
+ * Borders can't follow clip-path, so rings are stacked octagon layers.
  * ===================================================================== */
+
+export const OCTAGON =
+  "polygon(29.29% 0, 70.71% 0, 100% 29.29%, 100% 70.71%, 70.71% 100%, 29.29% 100%, 0 70.71%, 0 29.29%)";
+
+function Octagon({
+  size,
+  className = "",
+  children,
+}: {
+  size: number;
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      className={`grid shrink-0 place-items-center ${className}`}
+      style={{ width: size, height: size, clipPath: OCTAGON }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** The octagon alone, no label. Icon is 42% of the tile, as in the deck. */
+export function BadgeTile({
+  icon,
+  state,
+  size = 64,
+  title,
+}: {
+  icon: BadgeIconKey;
+  state: BadgeState;
+  size?: number;
+  title?: string;
+}) {
+  const iconSize = Math.round(size * 0.42);
+  // Deck: 132 tile → 142 lime → 152 wash (≈4% of the tile per ring).
+  const ring = Math.max(3, Math.round(size * 0.04));
+
+  if (state === "locked") {
+    return (
+      <Octagon size={size} className="bg-line-2" >
+        <Octagon size={size - 2} className="bg-page text-line-2">
+          <span title={title} className="grid place-items-center">
+            <BadgeIcon icon={icon} size={iconSize} />
+          </span>
+        </Octagon>
+      </Octagon>
+    );
+  }
+
+  const core = (
+    <Octagon size={size} className="bg-carbon text-lime">
+      <span title={title} className="grid place-items-center">
+        <BadgeIcon icon={icon} size={iconSize} />
+      </span>
+    </Octagon>
+  );
+
+  if (state === "new") {
+    return (
+      <Octagon size={size + ring * 4} className="bg-lime-wash">
+        <Octagon size={size + ring * 2} className="bg-lime">
+          {core}
+        </Octagon>
+      </Octagon>
+    );
+  }
+
+  return core;
+}
 
 export function Badge({
   badge,
@@ -136,24 +209,14 @@ export function Badge({
   size?: number;
   showLabel?: boolean;
 }) {
-  const iconSize = Math.round(size * 0.56);
-  const tile =
-    badge.state === "locked"
-      ? "border border-line-2 bg-page text-line-2"
-      : "bg-carbon text-lime";
-  const wrap =
-    badge.state === "new"
-      ? "outline outline-[3px] outline-lime outline-offset-[3px] ring-[7px] ring-lime-wash"
-      : "";
+  // Reserve the ring space on every state so the row stays aligned.
+  const ring = Math.max(3, Math.round(size * 0.04));
+  const box = size + ring * 4;
 
   return (
-    <div className="flex flex-col items-center text-center" style={{ width: showLabel ? size + 32 : size }}>
-      <div
-        className={`grid shrink-0 place-items-center rounded-xs ${tile} ${wrap}`}
-        style={{ width: size, height: size }}
-        title={badge.name}
-      >
-        <BadgeIcon icon={badge.icon} size={iconSize} />
+    <div className="flex flex-col items-center text-center" style={{ width: showLabel ? box + 32 : box }}>
+      <div className="grid place-items-center" style={{ width: box, height: box }}>
+        <BadgeTile icon={badge.icon} state={badge.state} size={size} title={badge.name} />
       </div>
       {showLabel && (
         <>
@@ -165,7 +228,7 @@ export function Badge({
             {badge.name}
           </div>
           <div
-            className={`mt-1 font-mono text-[11px] ${
+            className={`mt-1 font-mono text-[11px] tracking-[0.1em] ${
               badge.state === "new"
                 ? "text-ink"
                 : badge.state === "earned"
@@ -219,8 +282,9 @@ export function GrowthRings({
   const c = ringColors(tone);
   const full = Math.min(RING_COUNT, Math.floor(days / RING_DAYS));
   const partial = full < RING_COUNT ? (days % RING_DAYS) / RING_DAYS : 0;
+  // Deck: outer 106 / mid 74 / inner 42 / dot 12, all 1px strokes.
   const radii = [14, 24, 34];
-  const stroke = 6;
+  const stroke = 1.5;
   const center = 40;
 
   return (
@@ -257,7 +321,7 @@ export function GrowthRings({
         );
       })}
       {/* Center dot: day one. */}
-      <circle cx={center} cy={center} r={4.5} fill={days >= 1 ? c.dot : c.empty} />
+      <circle cx={center} cy={center} r={4} fill={days >= 1 ? c.dot : c.empty} />
       {pulse && (
         <circle
           key={days}
@@ -267,6 +331,7 @@ export function GrowthRings({
           fill="none"
           stroke="#e4e422"
           strokeWidth={stroke}
+          strokeLinecap="butt"
           className="streak-pulse"
           style={{ transformOrigin: "40px 40px" }}
         />
@@ -281,30 +346,46 @@ export function GrowthRings({
  * 11 → 12 storyboard timing (check 140ms → ring 200ms → number 200ms).
  * ===================================================================== */
 
-const DAY_LETTERS = ["S", "S", "R", "K", "J", "S", "M"];
+const DAY_NAMES = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
 
+/**
+ * Seven boxes, Mon → Sun. Deck: filled lime = done, 1px lime outline with
+ * shield = protected, 1px grey outline = waiting. A pending day that sits
+ * before a later done day was missed, and gets the deck's short dash.
+ */
 function WeekDots({ week, dark }: { week: WeekDay[]; dark?: boolean }) {
+  const lastDone = week.reduce((acc, d, i) => (d === "pending" ? acc : i), -1);
   return (
-    <div className="flex gap-1.5" aria-label="Tugas minggu ini">
-      {week.map((d, i) => (
-        <span
-          key={i}
-          title={`${["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"][i]}: ${
-            d === "done" ? "selesai" : d === "shield" ? "pelindung dipakai" : "menunggu"
-          }`}
-          className={`grid size-6 place-items-center rounded-xs font-mono text-[10px] font-medium ${
-            d === "done"
-              ? "bg-lime text-ink"
-              : d === "shield"
-                ? "border-[1.5px] border-lime text-lime-deep"
-                : dark
-                  ? "border border-ink-2 text-ink-3"
-                  : "border border-line-2 text-ink-3"
-          }`}
-        >
-          {d === "shield" ? <ShieldIcon size={11} /> : DAY_LETTERS[i]}
-        </span>
-      ))}
+    <div className="flex gap-2" aria-label="Tugas minggu ini">
+      {week.map((d, i) => {
+        const missed = d === "pending" && i < lastDone;
+        return (
+          <span
+            key={i}
+            title={`${DAY_NAMES[i]}: ${
+              d === "done"
+                ? "selesai"
+                : d === "shield"
+                  ? "pelindung dipakai"
+                  : missed
+                    ? "terlewat"
+                    : "menunggu"
+            }`}
+            className={`grid size-7 place-items-center rounded-xs ${
+              d === "done"
+                ? "bg-lime"
+                : d === "shield"
+                  ? "border border-lime text-lime-deep"
+                  : dark
+                    ? "border border-ink-2"
+                    : "border border-line-2"
+            }`}
+          >
+            {d === "shield" && <ShieldIcon size={14} />}
+            {missed && <span className="h-px w-3 bg-line-2" aria-hidden />}
+          </span>
+        );
+      })}
     </div>
   );
 }
@@ -374,7 +455,7 @@ export function StreakCard({
       <div
         key={shown}
         className={`font-display font-bold leading-none tracking-[-0.03em] ${
-          compact ? "text-[36px]" : "text-[48px]"
+          compact ? "text-[36px]" : "text-[56px]"
         } ${dark ? "text-lime" : "text-ink"} ${leaving !== null ? "num-in" : ""}`}
       >
         {shown}
@@ -383,7 +464,7 @@ export function StreakCard({
         <div
           aria-hidden
           className={`num-out absolute inset-0 font-display font-bold leading-none tracking-[-0.03em] ${
-            compact ? "text-[36px]" : "text-[48px]"
+            compact ? "text-[36px]" : "text-[56px]"
           } ${dark ? "text-lime" : "text-ink"}`}
         >
           {leaving}
@@ -426,7 +507,7 @@ export function StreakCard({
     >
       {label}
       <div className="mt-4 flex items-center gap-5">
-        <GrowthRings days={days} size={80} tone={tone} pulse={pulse} />
+        <GrowthRings days={days} size={96} tone={tone} pulse={pulse} />
         <div>
           {number}
           <div className="mt-2">{unit}</div>
@@ -480,7 +561,11 @@ export function HealthBars({
         <span
           key={i}
           className={`rounded-xs ${dim} ${
-            i < on ? onCls : "border border-line-2 bg-transparent"
+            i < on
+              ? onCls
+              : health === "kritis"
+                ? "border border-alert bg-transparent"
+                : "border border-line-2 bg-transparent"
           }`}
         />
       ))}
@@ -598,7 +683,7 @@ export function WeeklyChallengeCard({
       </div>
       <p className="mt-2.5 text-[15px] font-medium leading-snug text-on-carbon">{text}</p>
       <div className="mt-4 flex items-center gap-4">
-        <div className="h-1 flex-1 overflow-hidden rounded-xs bg-carbon-2">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-xs bg-carbon-2">
           <div className="h-full rounded-xs bg-lime transition-[width] duration-500" style={{ width: `${pct}%` }} />
         </div>
         <span className="font-mono text-[12px] text-on-carbon">
@@ -711,9 +796,7 @@ export function StageTeasers({ data }: { data: StageUnlock }) {
         <div key={t.title} className="rounded-lg border border-line bg-surface p-5">
           <div className="flex gap-5">
             {i === 0 && (
-              <div className="grid size-[60px] shrink-0 place-items-center rounded-xs border border-line-2 bg-page text-line-2">
-                <BadgeIcon icon="bunga" size={34} />
-              </div>
+              <BadgeTile icon="bunga" state="locked" size={60} />
             )}
             <div className="min-w-0 flex-1">
               {i === 0 && (
@@ -724,7 +807,7 @@ export function StageTeasers({ data }: { data: StageUnlock }) {
               <div className="mt-1 text-[16px] font-semibold text-ink">{t.title}</div>
               <div className="mt-1 text-[14px] text-ink-2">{t.when}</div>
               {t.pct > 0 && (
-                <div className="mt-4 h-1 overflow-hidden rounded-xs bg-line">
+                <div className="mt-4 h-1.5 overflow-hidden rounded-xs bg-line">
                   <div className="h-full bg-line-2" style={{ width: `${t.pct}%` }} />
                 </div>
               )}

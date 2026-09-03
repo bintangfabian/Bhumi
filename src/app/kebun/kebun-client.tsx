@@ -136,7 +136,7 @@ export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
                   <div className="mt-4 flex gap-2">
                     {pl.labels.map((label, i) => (
                       <div key={label} className="flex-1">
-                        <div className={`h-[2px] ${i <= pl.active ? "bg-ink" : "bg-line-2"}`} />
+                        <div className={`h-[3px] ${i <= pl.active ? "bg-ink" : "bg-line-2"}`} />
                         <div
                           className={`mt-2 text-center font-mono text-[10.5px] uppercase tracking-[0.1em] ${
                             i === pl.active ? "font-medium text-ink" : "text-ink-3"

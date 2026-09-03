@@ -74,7 +74,7 @@ export const HEALTH_LABEL: Record<Health, string> = {
 export const HEALTH_BARS: Record<Health, number> = {
   sehat: 5,
   perhatian: 3,
-  kritis: 2,
+  kritis: 1,
 };
 
 export const HEALTH_COPY: Record<Health, string> = {

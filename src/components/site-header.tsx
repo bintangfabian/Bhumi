@@ -19,6 +19,9 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   const { count } = useCart();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  if (pathname?.startsWith("/masuk")) return null;
+
   const nav = user?.role === "superadmin"
     ? [...NAV, { href: "/admin", label: "Admin", match: (p: string) => p.startsWith("/admin") }]
     : NAV;

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui";
 
 const COLS = [
@@ -29,6 +32,9 @@ const COLS = [
 ];
 
 export function SiteFooter() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/masuk")) return null;
+
   return (
     <footer className="mt-24 bg-carbon text-on-carbon">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
