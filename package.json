@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:setup": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "goey-toast": "^0.5.0",
+    "mysql2": "^3.24.3",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8"

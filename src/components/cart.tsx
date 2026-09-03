@@ -25,11 +25,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "tumbuh.cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  // Seeded with 2 items so the "Keranjang · 2" badge from the mockup shows on first load.
-  const [items, setItems] = useState<CartItem[]>([
-    { id: "cabai-rawit", name: "Paket Cabai Rawit", price: 89000, qty: 1 },
-    { id: "tomat-cherry", name: "Paket Tomat Cherry", price: 95000, qty: 1 },
-  ]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

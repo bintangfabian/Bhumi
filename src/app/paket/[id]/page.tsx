@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PACKS, buildDetail, getPack } from "@/lib/data";
+import { getPackDetail } from "@/lib/repo/packs";
 import { Container, Figure, LevelBadge, Meta, Photo } from "@/components/ui";
 import { BuyBar } from "./buy-bar";
-
-export function generateStaticParams() {
-  return PACKS.map((p) => ({ id: p.id }));
-}
 
 export default async function PackDetailPage({
   params,
@@ -14,9 +10,8 @@ export default async function PackDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const pack = getPack(id);
-  if (!pack) notFound();
-  const d = buildDetail(pack);
+  const d = await getPackDetail(id);
+  if (!d) notFound();
 
   const spec = [
     { k: "Estimasi panen", v: d.harvestRange },

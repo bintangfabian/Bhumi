@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { useCart } from "@/components/cart";
 import { Logo } from "@/components/logo";
 import { ButtonLink, Container } from "@/components/ui";
+import { logoutAction } from "@/app/masuk/actions";
+import type { SessionUser } from "@/lib/session";
 
 const NAV = [
   { href: "/katalog", label: "Katalog", match: (p: string) => p.startsWith("/katalog") || p.startsWith("/paket") },
@@ -13,10 +15,13 @@ const NAV = [
   { href: "/kebun", label: "Kebun Saya", match: (p: string) => p.startsWith("/kebun") },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ user }: { user: SessionUser | null }) {
   const { count } = useCart();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const nav = user?.role === "superadmin"
+    ? [...NAV, { href: "/admin", label: "Admin", match: (p: string) => p.startsWith("/admin") }]
+    : NAV;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-page">
@@ -26,7 +31,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="ml-5 hidden items-center gap-7 min-[880px]:flex">
-          {NAV.map((item) => {
+          {nav.map((item) => {
             const active = item.match(pathname);
             return (
               <Link
@@ -54,14 +59,26 @@ export function SiteHeader() {
               {String(count).padStart(2, "0")}
             </span>
           </Link>
-          <ButtonLink
-            href="/masuk"
-            variant="solid"
-            size="sm"
-            className="hidden sm:inline-flex"
-          >
-            Masuk
-          </ButtonLink>
+          {user ? (
+            <form action={logoutAction} className="hidden items-center gap-2 sm:flex">
+              <span className="font-mono text-[12px] text-ink-3">{user.name}</span>
+              <button
+                type="submit"
+                className="h-9 border border-line-2 bg-surface px-3 text-[13px] font-medium text-ink transition-colors hover:border-ink"
+              >
+                Keluar
+              </button>
+            </form>
+          ) : (
+            <ButtonLink
+              href="/masuk"
+              variant="solid"
+              size="sm"
+              className="hidden sm:inline-flex"
+            >
+              Masuk
+            </ButtonLink>
+          )}
           <button
             aria-label={open ? "Tutup menu" : "Buka menu"}
             aria-expanded={open}
@@ -76,7 +93,7 @@ export function SiteHeader() {
       {open && (
         <nav className="border-t border-line bg-surface min-[880px]:hidden">
           <Container className="flex flex-col py-1">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
@@ -86,13 +103,25 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/masuk"
-              onClick={() => setOpen(false)}
-              className="py-3 text-[15px] font-semibold text-ink"
-            >
-              Masuk
-            </Link>
+            {user ? (
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  onClick={() => setOpen(false)}
+                  className="w-full py-3 text-left text-[15px] font-semibold text-ink"
+                >
+                  Keluar ({user.name})
+                </button>
+              </form>
+            ) : (
+              <Link
+                href="/masuk"
+                onClick={() => setOpen(false)}
+                className="py-3 text-[15px] font-semibold text-ink"
+              >
+                Masuk
+              </Link>
+            )}
           </Container>
         </nav>
       )}

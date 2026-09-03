@@ -90,3 +90,115 @@
     color: var(--color-ink-3);
   }
 }
+
+/* ---- Gamification motion (every piece under 800 ms) ---- */
+
+@layer components {
+  /* 0–120 ms: press. Row dips to .98, line strengthens. */
+  .task-row {
+    transition: transform 120ms ease-out;
+  }
+  .task-row:active {
+    transform: scale(0.98);
+  }
+  /* 120–260 ms: check draws from the left. */
+  .check-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: check-draw 140ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+  /* 260–460 ms: ring closes. */
+  .streak-arc {
+    transition: stroke-dashoffset 200ms cubic-bezier(0.16, 1, 0.3, 1) 260ms;
+  }
+  .streak-pulse {
+    animation: streak-pulse 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  /* 420–620 ms: number swaps. Old leaves −6px, new enters from +6px. */
+  .num-out {
+    animation: num-out 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .num-in {
+    animation: num-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .sheet-backdrop {
+    animation: fade-in 160ms ease-out both;
+  }
+  .sheet-panel {
+    animation: sheet-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes streak-pulse {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+@keyframes num-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+@keyframes num-in {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-row,
+  .check-draw,
+  .streak-arc,
+  .streak-pulse,
+  .num-out,
+  .num-in,
+  .sheet-backdrop,
+  .sheet-panel {
+    animation: none !important;
+    transition: none !important;
+  }
+  .check-draw {
+    stroke-dashoffset: 0;
+  }
+  .streak-pulse {
+    display: none;
+  }
+}

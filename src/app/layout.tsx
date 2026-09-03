@@ -4,6 +4,7 @@ import "./globals.css";
 import { CartProvider } from "@/components/cart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { getSession } from "@/lib/session";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -29,9 +30,10 @@ export const metadata: Metadata = {
     "Bibit, media tanam, dan alat dikirim lengkap ke rumah. Panduan digital menemani kamu dari semai sampai panen pertama.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const user = await getSession();
   return (
     <html
       lang="id"
@@ -39,7 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-page">
         <CartProvider>
-          <SiteHeader />
+          <SiteHeader user={user} />
           <main>{children}</main>
           <SiteFooter />
         </CartProvider>
