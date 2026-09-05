@@ -26,8 +26,11 @@ export async function savePackAction(pack: AdminPack) {
     await conn.beginTransaction();
 
     await conn.query(
-      "UPDATE packs SET name=?, price=?, level=?, days=?, status=? WHERE id=?",
-      [pack.name, Number(pack.price) || 0, pack.level, Number(pack.days) || 0, pack.status, pack.id],
+      "UPDATE packs SET name=?, price=?, level=?, days=?, status=?, success_rate=? WHERE id=?",
+      [
+        pack.name, Number(pack.price) || 0, pack.level, Number(pack.days) || 0, pack.status,
+        Math.min(100, Math.max(0, Number(pack.successRate) || 0)), pack.id,
+      ],
     );
 
     const [existingStages] = await conn.query<RowDataPacket[]>(

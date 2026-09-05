@@ -15,11 +15,14 @@ export type PackCard = {
   isNew: boolean;
   photo: string;
   isi: string[];
+  successRate: number;
+  effort: string;
+  sun: string;
 };
 
 export async function listCatalogPacks(): Promise<PackCard[]> {
   const [packs] = await pool.query<RowDataPacket[]>(
-    `SELECT id, name, tagline, level, days, price, is_new, photo_url
+    `SELECT id, name, tagline, level, days, price, is_new, photo_url, success_rate, effort, sun
      FROM packs WHERE status = 'Terbit' ORDER BY sort_order`,
   );
   if (packs.length === 0) return [];
@@ -55,13 +58,14 @@ export async function listCatalogPacks(): Promise<PackCard[]> {
     isNew: !!p.is_new,
     photo: p.photo_url,
     isi: isiByPack.get(p.id) ?? [],
+    successRate: p.success_rate,
+    effort: p.effort,
+    sun: p.sun,
   }));
 }
 
 export type PackDetail = PackCard & {
   harvestRange: string;
-  effort: string;
-  sun: string;
   thumbs: { label: string; photo: string }[];
   kit: { name: string; desc: string; qty: string }[];
   guide: {
@@ -77,7 +81,7 @@ export type PackDetail = PackCard & {
 
 export async function getPackDetail(id: string): Promise<PackDetail | null> {
   const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT id, name, tagline, level, days, price, is_new, status, photo_url, effort, sun
+    `SELECT id, name, tagline, level, days, price, is_new, status, photo_url, effort, sun, success_rate
      FROM packs WHERE id = ?`,
     [id],
   );
@@ -138,6 +142,7 @@ export async function getPackDetail(id: string): Promise<PackDetail | null> {
     harvestRange: `${p.days - 8}–${p.days + 7} hari`,
     effort: p.effort,
     sun: p.sun,
+    successRate: p.success_rate,
     thumbs: gallery.map((g) => ({ label: g.label, photo: g.photo_url })),
     kit: kit.map((k) => ({ name: k.name, desc: k.description, qty: k.qty })),
     guide,

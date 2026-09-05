@@ -143,6 +143,24 @@ export async function toggleChecklistAction(plantId: number, checklistId: number
   revalidatePath("/kebun/lencana");
 }
 
+export async function addProgressPhotoAction(plantId: number, photoUrl: string) {
+  const user = await getSession();
+  if (!user || !photoUrl) return;
+
+  const [own] = await pool.query<RowDataPacket[]>(
+    "SELECT id FROM plants WHERE id = ? AND user_id = ?",
+    [plantId, user.id],
+  );
+  if (!own[0]) return;
+
+  await pool.query(
+    "INSERT INTO progress_photos (plant_id, taken_on, photo_url) VALUES (?, CURDATE(), ?)",
+    [plantId, photoUrl],
+  );
+  revalidatePath("/kebun");
+  revalidatePath(`/kebun/panduan/${plantId}`);
+}
+
 export async function addJournalAction(formData: FormData) {
   const user = await getSession();
   if (!user) return;

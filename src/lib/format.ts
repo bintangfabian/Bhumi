@@ -39,3 +39,17 @@ export function mondayOf(d: Date) {
   x.setDate(x.getDate() - diff);
   return x;
 }
+
+/** "30 menit yang lalu" / "2 jam yang lalu" / tanggal singkat kalau lebih dari 2 hari. */
+export function relativeId(d: Date) {
+  const diffMs = Date.now() - d.getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return "Baru saja";
+  if (min < 60) return `${min} menit yang lalu`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} jam yang lalu`;
+  const day = Math.floor(hr / 24);
+  if (day < 2) return "Kemarin";
+  if (day < 7) return `${day} hari yang lalu`;
+  return idDate(d);
+}

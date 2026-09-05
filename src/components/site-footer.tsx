@@ -33,7 +33,7 @@ const COLS = [
 
 export function SiteFooter() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/masuk")) return null;
+  if (pathname?.startsWith("/masuk") || pathname?.startsWith("/kebun")) return null;
 
   return (
     <footer className="mt-24 bg-carbon text-on-carbon">

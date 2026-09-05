@@ -68,13 +68,13 @@ const PHOTOS = {
 /* ---------- paket ---------- */
 
 const PACKS = [
-  { id: "cabai-rawit", name: "Paket Cabai Rawit", tagline: "Pedas, rajin berbuah, dan paling gampang dirawat di pot.", level: "Pemula", days: 75, price: 89000, is_new: 0, status: "Terbit", sold: 128, photo: PHOTOS.chiliRed, kind: "cabai", stages: "4", highlights: ["Bibit F1", "Pupuk organik", "5 polybag", "Sekop + sarung tangan"] },
-  { id: "tomat-cherry", name: "Paket Tomat Cherry", tagline: "Manis, cepat panen, cocok untuk balkon atau teras sempit.", level: "Pemula", days: 70, price: 95000, is_new: 1, status: "Terbit", sold: 94, photo: PHOTOS.cherry, kind: "tomat", stages: "4", highlights: ["Bibit unggul", "Pupuk NPK", "5 polybag", "Ajir + tali"] },
-  { id: "duo", name: "Paket Duo Cabai & Tomat", tagline: "Dua tanaman sekaligus, satu panduan yang berjalan beriringan.", level: "Pemula", days: 80, price: 159000, is_new: 1, status: "Terbit", sold: 41, photo: PHOTOS.planters, kind: "duo", stages: "5", highlights: ["2 jenis bibit", "Pupuk organik", "8 polybag", "Set alat dasar"] },
-  { id: "cabai-keriting", name: "Paket Cabai Keriting", tagline: "Buah lebih besar, butuh pemangkasan dan perhatian ekstra.", level: "Menengah", days: 90, price: 105000, is_new: 0, status: "Terbit", sold: 57, photo: PHOTOS.chiliShelf, kind: "cabai", stages: "5", highlights: ["Bibit hibrida", "Pupuk kandang", "6 polybag", "Gunting pangkas"] },
-  { id: "tomat-beef", name: "Paket Tomat Beef", tagline: "Tomat besar untuk masak. Perlu penyangga dan pupuk rutin.", level: "Menengah", days: 95, price: 119000, is_new: 0, status: "Terbit", sold: 33, photo: PHOTOS.romaSunny, kind: "tomat", stages: "5", highlights: ["Bibit beef", "Pupuk cair", "6 polybag", "Ajir bambu"] },
-  { id: "cabai-gendot", name: "Paket Cabai Gendot", tagline: "Varietas dataran tinggi. Sensitif suhu, untuk yang sudah terbiasa.", level: "Mahir", days: 110, price: 135000, is_new: 0, status: "Terbit", sold: 12, photo: PHOTOS.chiliFlower, kind: "cabai", stages: "6", highlights: ["Bibit lokal", "Media tanam khusus", "4 polybag", "Termometer tanah"] },
-  { id: "selada-hidroponik", name: "Paket Selada Hidroponik", tagline: "Masih disiapkan. Selada keriting di sistem wick sederhana.", level: "Pemula", days: 45, price: 79000, is_new: 0, status: "Draf", sold: 0, photo: PHOTOS.handSeedling, kind: "selada", stages: "0", highlights: ["Benih selada", "Netpot + rockwool", "Nutrisi AB mix"] },
+  { id: "cabai-rawit", name: "Paket Cabai Rawit", tagline: "Pedas, rajin berbuah, dan paling gampang dirawat di pot.", level: "Pemula", days: 75, price: 89000, is_new: 0, status: "Terbit", sold: 128, photo: PHOTOS.chiliRed, kind: "cabai", stages: "4", successRate: 95, highlights: ["Bibit F1", "Pupuk organik", "5 polybag", "Sekop + sarung tangan"] },
+  { id: "tomat-cherry", name: "Paket Tomat Cherry", tagline: "Manis, cepat panen, cocok untuk balkon atau teras sempit.", level: "Pemula", days: 70, price: 95000, is_new: 1, status: "Terbit", sold: 94, photo: PHOTOS.cherry, kind: "tomat", stages: "4", successRate: 88, highlights: ["Bibit unggul", "Pupuk NPK", "5 polybag", "Ajir + tali"] },
+  { id: "duo", name: "Paket Duo Cabai & Tomat", tagline: "Dua tanaman sekaligus, satu panduan yang berjalan beriringan.", level: "Pemula", days: 80, price: 159000, is_new: 1, status: "Terbit", sold: 41, photo: PHOTOS.planters, kind: "duo", stages: "5", successRate: 86, highlights: ["2 jenis bibit", "Pupuk organik", "8 polybag", "Set alat dasar"] },
+  { id: "cabai-keriting", name: "Paket Cabai Keriting", tagline: "Buah lebih besar, butuh pemangkasan dan perhatian ekstra.", level: "Menengah", days: 90, price: 105000, is_new: 0, status: "Terbit", sold: 57, photo: PHOTOS.chiliShelf, kind: "cabai", stages: "5", successRate: 84, highlights: ["Bibit hibrida", "Pupuk kandang", "6 polybag", "Gunting pangkas"] },
+  { id: "tomat-beef", name: "Paket Tomat Beef", tagline: "Tomat besar untuk masak. Perlu penyangga dan pupuk rutin.", level: "Menengah", days: 95, price: 119000, is_new: 0, status: "Terbit", sold: 33, photo: PHOTOS.romaSunny, kind: "tomat", stages: "5", successRate: 80, highlights: ["Bibit beef", "Pupuk cair", "6 polybag", "Ajir bambu"] },
+  { id: "cabai-gendot", name: "Paket Cabai Gendot", tagline: "Varietas dataran tinggi. Sensitif suhu, untuk yang sudah terbiasa.", level: "Mahir", days: 110, price: 135000, is_new: 0, status: "Terbit", sold: 12, photo: PHOTOS.chiliFlower, kind: "cabai", stages: "6", successRate: 72, highlights: ["Bibit lokal", "Media tanam khusus", "4 polybag", "Termometer tanah"] },
+  { id: "selada-hidroponik", name: "Paket Selada Hidroponik", tagline: "Masih disiapkan. Selada keriting di sistem wick sederhana.", level: "Pemula", days: 45, price: 79000, is_new: 0, status: "Draf", sold: 0, photo: PHOTOS.handSeedling, kind: "selada", stages: "0", successRate: 90, highlights: ["Benih selada", "Netpot + rockwool", "Nutrisi AB mix"] },
 ];
 
 const KIT = {
@@ -125,7 +125,21 @@ const STAGE_TPL = {
       ["Tanam di tray semai", "Isi tray dengan media, buat lubang 0,5 cm, masukkan satu benih per lubang, lalu tutup tipis.", "foto: tray semai 24 lubang", PHOTOS.tray],
     ],
     checklist: ["Rendam benih 6 jam", "Isi tray dengan media tanam", "Tanam 1 benih per lubang", "Letakkan di tempat teduh terang"],
-    daily: [["Semprot tray", "Pagi"], ["Cek kelembapan media", "Sore"]],
+    daily: [
+      ["Semprot tray", "Pagi"],
+      ["Cek Kelembapan & Siram Ringan", "Sore", {
+        intro: "Tunas hijau kecil sudah mulai bermunculan dari balik tanah. Mereka butuh air secukupnya tanpa terendam.",
+        warning: "Hindari menyiram pakai gayung/kran langsung! Semburan air kencang merusak tunas rapuh.",
+        dosLabel: "Lembap Pas: Dingin & remah menempel lembut",
+        dosPhoto: PHOTOS.peatPots,
+        dontsLabel: "Becek/Tergenang: Akar tunas mudah busuk",
+        dontsPhoto: PHOTOS.tray,
+        steps: [
+          ["Tes Sentuh Jari", "Benamkan ujung jari telunjuk 1–2 cm ke dalam tanah pot."],
+          ["Semprot Halus Berkala", "Jika tanah kering, gunakan spray misting halus sampai basah merata."],
+        ],
+      }],
+    ],
   },
   keras: {
     title: "Pengerasan bibit", short: "Keras", badge: "daun", photo: PHOTOS.chiliWindow, media: "pengerasan.jpg",
@@ -162,7 +176,22 @@ const STAGE_TPL = {
       ["Periksa hama tiap 3 hari", "Balik daun dan cari kutu daun atau bercak putih. Bila ada, semprot larutan sabun cair encer pada pagi hari.", "foto: balik daun cek hama", PHOTOS.greenChili],
     ],
     checklist: ["Siram sampai media lembap", "Cek balik daun dari kutu daun", "Pangkas tunas air bawah", "Pemupukan kedua", "Foto perkembangan mingguan"],
-    daily: [["Siram pagi", "Pagi"], ["Cek hama di bawah daun", "Pagi"], ["Pangkas tunas air", "Sore"]],
+    daily: [
+      ["Siram pagi", "Pagi"],
+      ["Cek Hama di Balik Daun", "Pagi", {
+        intro: "Kutu daun dan bercak putih paling sering muncul di balik daun bawah, tempat yang jarang kelihatan sekilas.",
+        warning: "Jangan semprot pestisida kimia dulu — larutan sabun cair encer sudah cukup untuk kutu daun ringan.",
+        dosLabel: "Daun Sehat: Hijau merata, tidak berlubang",
+        dosPhoto: PHOTOS.chiliFlower,
+        dontsLabel: "Hama Aktif: Kutu/bercak putih di balik daun",
+        dontsPhoto: PHOTOS.greenChili,
+        steps: [
+          ["Balik Setiap Daun", "Periksa sisi bawah daun secara bergiliran, terutama daun tua di bagian bawah tanaman."],
+          ["Semprot Bila Perlu", "Kalau ada kutu daun, semprot larutan sabun cair encer pada pagi hari, ulangi 2–3 hari sekali."],
+        ],
+      }],
+      ["Pangkas tunas air", "Sore"],
+    ],
   },
   rawatTomat: {
     title: "Perawatan & pengikatan", short: "Rawat", badge: "bunga", photo: PHOTOS.vineTomat, media: "ikat-batang.jpg",
@@ -175,7 +204,22 @@ const STAGE_TPL = {
       ["Pupuk kalsium saat berbunga", "Mencegah ujung buah busuk. Larutkan sesuai takaran, siram pagi hari.", "foto: melarutkan pupuk", PHOTOS.wateringCan],
     ],
     checklist: ["Ikat batang ke ajir", "Buang tunas samping", "Pupuk kalsium saat berbunga", "Foto perkembangan mingguan"],
-    daily: [["Siram pagi", "Pagi"], ["Cek hama di bawah daun", "Pagi"], ["Ikat batang ke ajir", "Sore"]],
+    daily: [
+      ["Siram pagi", "Pagi"],
+      ["Cek hama di bawah daun", "Pagi"],
+      ["Ikat Batang ke Ajir", "Sore", {
+        intro: "Batang tomat tumbuh cepat dan mudah patah kalau dibiarkan menjuntai tanpa penyangga.",
+        warning: "Jangan ikat terlalu kencang — batang masih akan menebal, ikatan ketat bisa mencekik jaringan tanaman.",
+        dosLabel: "Ikatan Longgar: Angka 8, batang bisa bergerak",
+        dosPhoto: PHOTOS.tomatStaked,
+        dontsLabel: "Ikatan Kencang: Batang tertekan, mudah patah",
+        dontsPhoto: PHOTOS.vineTomat,
+        steps: [
+          ["Pilih Titik Ikat", "Ikat tiap kenaikan 20 cm batang, mulai dari yang paling bawah."],
+          ["Ikat Angka Delapan", "Lilit tali membentuk angka 8 antara ajir dan batang supaya longgar tapi stabil."],
+        ],
+      }],
+    ],
   },
   bunga: {
     title: "Pembungaan & pembuahan", short: "Bunga", badge: "buah", photo: PHOTOS.chiliFlower, media: "pembungaan.jpg",
@@ -365,8 +409,8 @@ async function main() {
   const stageIds = {}; // pack_id -> [{id, no, checklistIds[]}]
   for (const [pi, p] of PACKS.entries()) {
     await conn.query(
-      "INSERT INTO packs (id, name, tagline, level, days, price, is_new, status, sold, photo_url, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-      [p.id, p.name, p.tagline, p.level, p.days, p.price, p.is_new, p.status, p.sold, p.photo, pi],
+      "INSERT INTO packs (id, name, tagline, level, days, price, is_new, status, sold, photo_url, success_rate, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      [p.id, p.name, p.tagline, p.level, p.days, p.price, p.is_new, p.status, p.sold, p.photo, p.successRate, pi],
     );
     for (const [i, label] of p.highlights.entries()) {
       await conn.query("INSERT INTO pack_highlights (pack_id, label, sort_order) VALUES (?,?,?)", [p.id, label, i]);
@@ -401,15 +445,35 @@ async function main() {
         const [r] = await conn.query("INSERT INTO stage_checklist (stage_id, label, sort_order) VALUES (?,?,?)", [stageId, label, i]);
         checklistIds.push(r.insertId);
       }
-      for (const [i, [title, when]] of t.daily.entries()) {
-        await conn.query("INSERT INTO stage_daily_tasks (stage_id, title, when_label, sort_order) VALUES (?,?,?,?)", [stageId, title, when, i]);
+      const dailyTaskIds = [];
+      for (const [i, [title, when, rich]] of t.daily.entries()) {
+        const [dr] = await conn.query(
+          "INSERT INTO stage_daily_tasks (stage_id, title, when_label, sort_order, intro, warning, dos_label, dos_photo_url, donts_label, donts_photo_url) VALUES (?,?,?,?,?,?,?,?,?,?)",
+          [
+            stageId, title, when, i,
+            rich?.intro ?? null, rich?.warning ?? null,
+            rich?.dosLabel ?? "", rich?.dosPhoto ?? "",
+            rich?.dontsLabel ?? "", rich?.dontsPhoto ?? "",
+          ],
+        );
+        dailyTaskIds.push(dr.insertId);
+        if (rich?.steps) {
+          for (const [si2, [stepTitle, stepBody]] of rich.steps.entries()) {
+            await conn.query(
+              "INSERT INTO stage_daily_task_steps (task_id, title, body, sort_order) VALUES (?,?,?,?)",
+              [dr.insertId, stepTitle, stepBody, si2],
+            );
+          }
+        }
       }
-      stageIds[p.id].push({ id: stageId, no: si + 1, checklistIds, daily: t.daily, duration });
+      stageIds[p.id].push({ id: stageId, no: si + 1, checklistIds, daily: t.daily, dailyTaskIds, duration });
     }
   }
   console.log(`✓ ${PACKS.length} paket beserta tahap panduan`);
 
   // Akun + data kebun
+  const userIdByEmail = {};
+  const plantIdByKey = {};
   for (const u of USERS) {
     const hash = await bcrypt.hash(u.password, 10);
     const [ur] = await conn.query(
@@ -417,6 +481,7 @@ async function main() {
       [u.email, hash, u.name, u.role, u.shields, u.best],
     );
     const userId = ur.insertId;
+    userIdByEmail[u.email] = userId;
 
     for (const [badge, at] of u.badges) {
       const earnedAt = at.length === 10 ? `${at} 08:00:00` : at;
@@ -445,6 +510,7 @@ async function main() {
         [userId, pl.pack, pl.name, pl.photo, daysAgo(pl.plantedDaysAgo), pl.health, pl.lastSeenStage, pl.harvestedDaysAgo != null ? daysAgo(pl.harvestedDaysAgo) : null],
       );
       const plantId = pr.insertId;
+      plantIdByKey[`${u.email}:${pl.name}`] = plantId;
       const stages = stageIds[pl.pack];
 
       for (const [no, idxs] of Object.entries(pl.checklistDone)) {
@@ -461,8 +527,8 @@ async function main() {
       for (const [i, [title, when]] of current.daily.entries()) {
         const isDone = pl.todayDone === "all" || (Array.isArray(pl.todayDone) && pl.todayDone.includes(i));
         await conn.query(
-          "INSERT INTO plant_tasks (plant_id, task_date, title, when_label, sort_order, done_at) VALUES (?,?,?,?,?,?)",
-          [plantId, daysAgo(0), title, when, i, isDone ? hoursAgo(2) : null],
+          "INSERT INTO plant_tasks (plant_id, task_date, title, when_label, sort_order, done_at, source_task_id) VALUES (?,?,?,?,?,?,?)",
+          [plantId, daysAgo(0), title, when, i, isDone ? hoursAgo(2) : null, current.dailyTaskIds?.[i] ?? null],
         );
       }
 
@@ -475,6 +541,57 @@ async function main() {
     }
   }
   console.log(`✓ ${USERS.length} akun beserta tanaman, lencana, dan streak`);
+
+  // ---------- Learn Hub: deteksi gejala (statis, rule-based) ----------
+  const CARE_ISSUES = [
+    ["semua", "Daun menguning", "Overwatering atau kekurangan sinar matahari", "Kurangi frekuensi siram, pindahkan pot ke area yang kena matahari pagi 5–6 jam. Cek drainase pot tidak tersumbat.", "waspada"],
+    ["semua", "Batang layu mendadak", "Kekurangan air atau terik berlebih di siang hari", "Siram segera sampai media lembap merata, pindahkan sementara ke tempat teduh sampai batang tegak kembali.", "darurat"],
+    ["semua", "Bintik/serbuk putih di daun", "Embun tepung (jamur)", "Pangkas daun yang terinfeksi berat, semprot larutan baking soda encer, jaga sirkulasi udara antar pot.", "waspada"],
+    ["semua", "Daun berlubang-lubang", "Ulat grayak atau kutu daun aktif", "Balik daun untuk cari telur/ulat, ambil manual, semprot larutan sabun cair encer pada sore hari.", "waspada"],
+    ["cabai", "Bunga rontok sebelum jadi buah", "Pot terlalu sering dipindah atau kekurangan kalium", "Biarkan pot di posisi tetap, ganti pupuk ke kadar kalium lebih tinggi tiap 10 hari.", "info"],
+    ["cabai", "Buah keriput sebelum matang", "Kekurangan air saat pembesaran buah", "Siram rutin pagi & sore selama masa pembuahan, jangan biarkan media benar-benar kering.", "waspada"],
+    ["tomat", "Ujung buah busuk hitam", "Kekurangan kalsium (blossom end rot)", "Beri pupuk kalsium saat mulai berbunga, jaga penyiraman tetap konsisten (tidak kering-basah bergantian).", "waspada"],
+    ["tomat", "Batang tomat rebah", "Ajir kurang kokoh atau belum diikat", "Tambahkan ajir bambu yang lebih tinggi, ikat batang tiap kenaikan 20 cm dengan simpul longgar.", "info"],
+  ];
+  for (const [i, [kind, symptom, cause, action, severity]] of CARE_ISSUES.entries()) {
+    await conn.query(
+      "INSERT INTO care_issues (plant_kind, symptom, cause, action, severity, sort_order) VALUES (?,?,?,?,?,?)",
+      [kind, symptom, cause, action, severity, i],
+    );
+  }
+  console.log(`✓ ${CARE_ISSUES.length} entri deteksi gejala (Learn Hub)`);
+
+  // ---------- Komunitas: contoh post + like ----------
+  const rani = userIdByEmail["rani@bhumi.id"];
+  const dimas = userIdByEmail["dimas@bhumi.id"];
+  const sari = userIdByEmail["sari@bhumi.id"];
+  const budi = userIdByEmail["budi@bhumi.id"];
+  const lina = userIdByEmail["lina@bhumi.id"];
+  const COMMUNITY_POSTS = [
+    { user: sari, plant: plantIdByKey["sari@bhumi.id:Cabai Rawit"], photo: PHOTOS.chiliRed, caption: "Panen pertama! 14 buah merah dari tiga polybag, ngga nyangka starter kit Bhumi bisa sebagus ini buat pemula.", tag: "panen", daysAgo: 3 },
+    { user: rani, plant: plantIdByKey["rani@bhumi.id:Cabai Rawit"], photo: PHOTOS.chiliFlower, caption: "Bunga pertama mekar hari ini! Ngikutin pengingat harian jam 09.00 bikin tanaman jadi teratur dirawat.", tag: "umum", daysAgo: 2 },
+    { user: dimas, plant: plantIdByKey["dimas@bhumi.id:Cabai Rawit"], photo: PHOTOS.tray, caption: "Baru mulai, kecambah muncul di sebagian besar lubang tray. Semoga lancar sampai panen.", tag: "bibit-tunas", daysAgo: 1 },
+    { user: budi, plant: plantIdByKey["budi@bhumi.id:Cabai Keriting"], photo: PHOTOS.chiliShelf, caption: "Sempat lupa siram sehari, untung ada pelindung streak jadi ga kaget lihat progress turun.", tag: "umum", daysAgo: 4 },
+    { user: lina, plant: plantIdByKey["lina@bhumi.id:Cabai Gendot"], photo: PHOTOS.chiliWindow, caption: "Sudah 8 lencana terkumpul dari musim tanam sebelumnya, sekarang coba varietas yang lebih menantang.", tag: "umum", daysAgo: 6 },
+  ];
+  const postIds = [];
+  for (const p of COMMUNITY_POSTS) {
+    const [r] = await conn.query(
+      "INSERT INTO community_posts (user_id, plant_id, photo_url, caption, tag, created_at) VALUES (?,?,?,?,?,?)",
+      [p.user, p.plant ?? null, p.photo, p.caption, p.tag, `${daysAgo(p.daysAgo)} ${9 + p.daysAgo}:15:00`],
+    );
+    postIds.push(r.insertId);
+  }
+  const LIKES = [
+    [postIds[0], rani], [postIds[0], dimas], [postIds[0], budi],
+    [postIds[1], sari], [postIds[1], lina],
+    [postIds[2], rani],
+    [postIds[3], sari], [postIds[3], lina],
+  ];
+  for (const [postId, userId] of LIKES) {
+    await conn.query("INSERT IGNORE INTO community_likes (post_id, user_id) VALUES (?,?)", [postId, userId]);
+  }
+  console.log(`✓ ${COMMUNITY_POSTS.length} post komunitas beserta like`);
 
   await conn.end();
 

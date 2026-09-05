@@ -18,6 +18,7 @@ import {
   type WeekDay,
 } from "@/lib/gamification";
 import { Logo } from "@/components/logo";
+import { Photo } from "@/components/ui";
 
 /* =====================================================================
  * Icons — flat, geometric, 1.6px stroke. Drawn from the deck, never emoji.
@@ -657,6 +658,116 @@ export function TaskRow({
         )}
       </span>
     </button>
+  );
+}
+
+/* =====================================================================
+ * Task detail card — rich version of TaskRow for the next pending task,
+ * when its source template has intro/steps/dos-donts/warning content.
+ * Falls back to a plain TaskRow anywhere this content is absent.
+ * ===================================================================== */
+
+export function TaskDetailCard({
+  title,
+  meta,
+  done,
+  onToggle,
+  detail,
+  onAddPhoto,
+  photoBusy = false,
+}: {
+  title: string;
+  meta?: string;
+  done: boolean;
+  onToggle: () => void;
+  detail: {
+    intro: string;
+    warning: string;
+    dos: { label: string; photo: string } | null;
+    donts: { label: string; photo: string } | null;
+    steps: { title: string; body: string }[];
+  };
+  onAddPhoto?: () => void;
+  photoBusy?: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-ink bg-surface p-5 sm:p-6">
+      <div className="flex items-center justify-between font-mono text-[11px] font-medium uppercase tracking-[0.14em]">
+        <span className="bg-lime px-2 py-1 text-ink">Tugas hari ini</span>
+        {meta && <span className="text-ink-3">{meta}</span>}
+      </div>
+
+      <h3 className={`mt-4 text-[19px] ${done ? "text-ink-3 line-through" : "text-ink"}`}>{title}</h3>
+      {detail.intro && <p className="mt-2 text-[14px] leading-relaxed text-ink-2">{detail.intro}</p>}
+
+      {(detail.dos || detail.donts) && (
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {detail.dos && (
+            <div>
+              <Photo src={detail.dos.photo} alt={detail.dos.label} ratio="4 / 3" className="border border-line" sizes="240px" />
+              <div className="mt-1.5 flex items-start gap-1.5 text-[11.5px] leading-snug text-ink-2">
+                <span className="mt-0.5 text-lime-deep" aria-hidden>✓</span>
+                {detail.dos.label}
+              </div>
+            </div>
+          )}
+          {detail.donts && (
+            <div>
+              <Photo src={detail.donts.photo} alt={detail.donts.label} ratio="4 / 3" className="border border-line" sizes="240px" />
+              <div className="mt-1.5 flex items-start gap-1.5 text-[11.5px] leading-snug text-ink-2">
+                <span className="mt-0.5 text-alert" aria-hidden>✕</span>
+                {detail.donts.label}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {detail.steps.length > 0 && (
+        <ol className="mt-5 space-y-3">
+          {detail.steps.map((s, i) => (
+            <li key={s.title} className="flex gap-3">
+              <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-ink font-mono text-[11px] font-semibold text-on-carbon">
+                {i + 1}
+              </span>
+              <div>
+                <div className="text-[14px] font-semibold text-ink">{s.title}</div>
+                <div className="text-[13px] leading-relaxed text-ink-2">{s.body}</div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {detail.warning && (
+        <p className="mt-5 border-l-2 border-alert bg-alert-wash px-3 py-2.5 text-[13px] leading-relaxed text-alert">
+          <span className="font-semibold">Pantangan: </span>
+          {detail.warning}
+        </p>
+      )}
+
+      <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+        <button
+          type="button"
+          onClick={onToggle}
+          className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-sm text-[14px] font-semibold transition-colors ${
+            done ? "border border-ink bg-surface text-ink" : "bg-lime text-ink hover:bg-lime-deep"
+          }`}
+        >
+          {done ? "✓ Sudah selesai" : "Tandai sudah selesai"}
+        </button>
+        {onAddPhoto && (
+          <button
+            type="button"
+            onClick={onAddPhoto}
+            disabled={photoBusy}
+            className="inline-flex h-11 items-center justify-center rounded-sm border border-line-2 bg-surface px-4 text-[14px] font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60"
+          >
+            {photoBusy ? "Mengunggah…" : "Ambil foto progres"}
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 

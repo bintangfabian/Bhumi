@@ -19,6 +19,7 @@ export type AdminPack = {
   days: string;
   status: "Terbit" | "Draf";
   sold: number;
+  successRate: string;
   stages: AdminStage[];
 };
 
@@ -47,7 +48,7 @@ async function getAdminStages(packId: string): Promise<AdminStage[]> {
 
 export async function listAdminPacks(): Promise<AdminPack[]> {
   const [packs] = await pool.query<RowDataPacket[]>(
-    "SELECT id, name, price, level, days, status, sold FROM packs ORDER BY sort_order",
+    "SELECT id, name, price, level, days, status, sold, success_rate FROM packs ORDER BY sort_order",
   );
   const result: AdminPack[] = [];
   for (const p of packs) {
@@ -59,6 +60,7 @@ export async function listAdminPacks(): Promise<AdminPack[]> {
       days: String(p.days),
       status: p.status,
       sold: p.sold,
+      successRate: String(p.success_rate),
       stages: await getAdminStages(p.id),
     });
   }

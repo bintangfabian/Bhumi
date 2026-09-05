@@ -3,23 +3,30 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS
+  community_likes, community_posts, care_issues,
   weekly_challenges, reminders, care_logs, progress_photos, journal_entries,
   plant_checklist_progress, plant_tasks, plants, orders, user_badges, badges,
-  stage_daily_tasks, stage_checklist, stage_sections, pack_stages, pack_gallery,
-  pack_kit_items, pack_highlights, packs, sessions, users;
+  stage_daily_task_steps, stage_daily_tasks, stage_checklist, stage_sections,
+  pack_stages, pack_gallery, pack_kit_items, pack_highlights, packs, sessions, users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ---------- Akun ----------
 
 CREATE TABLE users (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  email         VARCHAR(190) NOT NULL UNIQUE,
-  password_hash VARCHAR(100) NOT NULL,
-  name          VARCHAR(100) NOT NULL,
-  role          ENUM('superadmin','customer') NOT NULL DEFAULT 'customer',
-  shields       TINYINT NOT NULL DEFAULT 1,
-  best_streak   INT NOT NULL DEFAULT 0,
-  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  id                      INT AUTO_INCREMENT PRIMARY KEY,
+  email                   VARCHAR(190) NOT NULL UNIQUE,
+  password_hash           VARCHAR(100) NOT NULL,
+  name                    VARCHAR(100) NOT NULL,
+  role                    ENUM('superadmin','customer') NOT NULL DEFAULT 'customer',
+  shields                 TINYINT NOT NULL DEFAULT 1,
+  best_streak             INT NOT NULL DEFAULT 0,
+  -- Pengingat & jadwal (diatur di Profil > Jadwal & Pengingat).
+  reminder_time           TIME NOT NULL DEFAULT '09:00:00',
+  siram_reminder_enabled  TINYINT(1) NOT NULL DEFAULT 1,
+  tips_enabled            TINYINT(1) NOT NULL DEFAULT 1,
+  quiet_start             TIME NOT NULL DEFAULT '22:00:00',
+  quiet_end               TIME NOT NULL DEFAULT '08:00:00',
+  created_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE sessions (
@@ -45,6 +52,8 @@ CREATE TABLE packs (
   photo_url  VARCHAR(500) NOT NULL DEFAULT '',
   effort     VARCHAR(40) NOT NULL DEFAULT '10 mnt/hari',
   sun        VARCHAR(40) NOT NULL DEFAULT '5–6 jam',
+  -- Angka pemasaran ("80% Berhasil"), diisi admin seperti effort/sun. Bukan metrik sistem otomatis.
+  success_rate TINYINT UNSIGNED NOT NULL DEFAULT 90,
   sort_order INT NOT NULL DEFAULT 0,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -118,12 +127,29 @@ CREATE TABLE stage_checklist (
 
 -- Rutinitas harian per tahap; dibuat jadi plant_tasks tiap hari.
 CREATE TABLE stage_daily_tasks (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  stage_id   INT NOT NULL,
-  title      VARCHAR(120) NOT NULL,
-  when_label ENUM('Pagi','Sore') NOT NULL DEFAULT 'Pagi',
-  sort_order INT NOT NULL DEFAULT 0,
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  stage_id        INT NOT NULL,
+  title           VARCHAR(120) NOT NULL,
+  when_label      ENUM('Pagi','Sore') NOT NULL DEFAULT 'Pagi',
+  sort_order      INT NOT NULL DEFAULT 0,
+  -- Konten kartu tugas kaya (opsional). Kosong → UI tampil ringkas seperti sebelumnya.
+  intro           TEXT,
+  warning         TEXT,
+  dos_label       VARCHAR(160) NOT NULL DEFAULT '',
+  dos_photo_url   VARCHAR(500) NOT NULL DEFAULT '',
+  donts_label     VARCHAR(160) NOT NULL DEFAULT '',
+  donts_photo_url VARCHAR(500) NOT NULL DEFAULT '',
   FOREIGN KEY (stage_id) REFERENCES pack_stages(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- "Langkah Praktis" bernomor di kartu tugas kaya.
+CREATE TABLE stage_daily_task_steps (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  task_id    INT NOT NULL,
+  title      VARCHAR(160) NOT NULL,
+  body       VARCHAR(255) NOT NULL DEFAULT '',
+  sort_order INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (task_id) REFERENCES stage_daily_tasks(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------- Gamifikasi ----------
@@ -183,15 +209,20 @@ CREATE TABLE plants (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE plant_tasks (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  plant_id   INT NOT NULL,
-  task_date  DATE NOT NULL,
-  title      VARCHAR(120) NOT NULL,
-  when_label ENUM('Pagi','Sore') NOT NULL DEFAULT 'Pagi',
-  sort_order INT NOT NULL DEFAULT 0,
-  done_at    DATETIME NULL,
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  plant_id        INT NOT NULL,
+  task_date       DATE NOT NULL,
+  title           VARCHAR(120) NOT NULL,
+  when_label      ENUM('Pagi','Sore') NOT NULL DEFAULT 'Pagi',
+  sort_order      INT NOT NULL DEFAULT 0,
+  done_at         DATETIME NULL,
+  -- Tugas yang digenerate otomatis (lihat ensureTodayTasks) menunjuk balik ke
+  -- template ini supaya kartu tugas kaya (langkah, foto dos/don'ts) bisa dimuat.
+  -- NULL untuk tugas lama/manual → UI tampil ringkas seperti sebelumnya.
+  source_task_id  INT NULL,
   KEY idx_plant_date (plant_id, task_date),
-  FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+  FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE,
+  FOREIGN KEY (source_task_id) REFERENCES stage_daily_tasks(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE plant_checklist_progress (
@@ -235,5 +266,40 @@ CREATE TABLE weekly_challenges (
   week_start DATE NOT NULL,
   text       VARCHAR(255) NOT NULL,
   target     INT NOT NULL DEFAULT 2,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------- Learn Hub: deteksi gejala (rule-based, bukan AI) ----------
+
+CREATE TABLE care_issues (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  plant_kind VARCHAR(40) NOT NULL DEFAULT 'semua',
+  symptom    VARCHAR(160) NOT NULL,
+  cause      VARCHAR(255) NOT NULL,
+  action     TEXT NOT NULL,
+  severity   ENUM('info','waspada','darurat') NOT NULL DEFAULT 'waspada',
+  sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------- Komunitas ----------
+
+CREATE TABLE community_posts (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  plant_id   INT NULL,
+  photo_url  VARCHAR(500) NOT NULL DEFAULT '',
+  caption    VARCHAR(600) NOT NULL,
+  tag        ENUM('panen','bibit-tunas','umum') NOT NULL DEFAULT 'umum',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE community_likes (
+  post_id    INT NOT NULL,
+  user_id    INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (post_id, user_id),
+  FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

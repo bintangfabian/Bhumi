@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { photo } from "@/lib/data";
 import { Button, Container, Photo, ProgressBar } from "@/components/ui";
+import { Badge } from "@/components/gamification";
 import type { GuideData } from "@/lib/repo/garden";
 import { addJournalAction, toggleChecklistAction } from "@/app/kebun/actions";
 
@@ -22,6 +23,22 @@ export function PanduanClient({ guide }: { guide: GuideData }) {
   );
   const [note, setNote] = useState("");
   const [journal, setJournal] = useState(guide.journal);
+  const [shared, setShared] = useState<"idle" | "done" | "copied">("idle");
+
+  const shareText = `Progres ${guide.plant} hari ke-${guide.day} dari ${guide.total} di Bhumi. Ikuti perjalanannya!`;
+  async function share() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Progres tanaman", text: shareText });
+        setShared("done");
+        return;
+      }
+      await navigator.clipboard.writeText(shareText);
+      setShared("copied");
+    } catch {
+      /* user dismissed the share sheet */
+    }
+  }
 
   const stage = guide.stages[stageIdx];
   const doneList = doneMap[stage.id] ?? [];
@@ -179,6 +196,21 @@ export function PanduanClient({ guide }: { guide: GuideData }) {
             </div>
           </div>
 
+          {/* Pencapaian berkebun */}
+          <div>
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-[15px]">Pencapaian berkebun</h2>
+              <span className="font-mono text-[12px] text-ink-3">
+                {guide.badges.filter((b) => b.state !== "locked").length}/{guide.badges.length} diraih
+              </span>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-5">
+              {guide.badges.map((b) => (
+                <Badge key={b.id} badge={b} size={56} showLabel />
+              ))}
+            </div>
+          </div>
+
           {/* Progress photos */}
           <div>
             <h2 className="text-[15px]">Foto perkembangan</h2>
@@ -246,6 +278,14 @@ export function PanduanClient({ guide }: { guide: GuideData }) {
               ))}
             </ul>
           </div>
+
+          <button
+            type="button"
+            onClick={share}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-lime text-[14px] font-semibold text-ink transition-colors hover:bg-lime-deep"
+          >
+            {shared === "copied" ? "Teks progres tersalin" : shared === "done" ? "Dibagikan" : "Bagikan progres"}
+          </button>
         </div>
 
         {/* Right column — stage detail */}

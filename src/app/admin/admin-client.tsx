@@ -69,7 +69,7 @@ export function AdminClient({ initialPacks }: { initialPacks: AdminPack[] }) {
       const id = await addPackAction();
       setPacks((prev) => [
         ...prev,
-        { id, name: "Paket baru", price: "0", level: "Pemula", days: "60", status: "Draf", sold: 0, stages: [] },
+        { id, name: "Paket baru", price: "0", level: "Pemula", days: "60", status: "Draf", sold: 0, successRate: "90", stages: [] },
       ]);
       setSelPack(id);
     });
@@ -225,6 +225,14 @@ export function AdminClient({ initialPacks }: { initialPacks: AdminPack[] }) {
                   <option>Terbit</option>
                   <option>Draf</option>
                 </select>
+              </label>
+              <label className="grid gap-1.5">
+                <span className={labelText}>Angka sukses panen (%)</span>
+                <input
+                  value={sel.successRate}
+                  onChange={(e) => editPack((p) => ({ ...p, successRate: e.target.value }))}
+                  className={`${field} font-mono`}
+                />
               </label>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5">

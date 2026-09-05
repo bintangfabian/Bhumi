@@ -24,6 +24,13 @@
 .DS_Store
 *.pem
 
+# exported Figma design assets (large images, not needed in repo history)
+/docs/Design/
+
+# user-uploaded photos (local disk storage, see src/app/api/upload/route.ts)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # debug
 npm-debug.log*
 yarn-debug.log*

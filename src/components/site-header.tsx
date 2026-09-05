@@ -20,7 +20,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  if (pathname?.startsWith("/masuk")) return null;
+  if (pathname?.startsWith("/masuk") || pathname?.startsWith("/kebun")) return null;
 
   const nav = user?.role === "superadmin"
     ? [...NAV, { href: "/admin", label: "Admin", match: (p: string) => p.startsWith("/admin") }]

@@ -164,6 +164,87 @@ export function Meta({ children }: { children: ReactNode }) {
   );
 }
 
+/* ---------------- "Segera hadir" — integrasi pihak-3 belum tersedia ---------------- */
+
+/** Dipakai di atas tombol/fitur yang butuh kredensial pihak-3 (OAuth, WhatsApp, dsb.) yang belum ada. */
+export function DisabledPill({ children = "Segera hadir" }: { children?: ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-xs border border-line-2 bg-page px-1.5 py-0.5 font-mono text-[9.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
+      {children}
+    </span>
+  );
+}
+
+/* ---------------- Switch — toggle accessible (pola shadcn) ---------------- */
+
+export function Switch({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full border transition-colors disabled:opacity-50 ${
+        checked ? "border-lime-deep bg-lime" : "border-line-2 bg-line"
+      }`}
+    >
+      <span
+        className={`inline-block size-4 rounded-full bg-surface shadow-float transition-transform ${
+          checked ? "translate-x-[19px]" : "translate-x-[3px]"
+        }`}
+      />
+    </button>
+  );
+}
+
+/* ---------------- Tabs — accessible tablist (pola shadcn) ---------------- */
+
+export function Tabs<T extends string>({
+  tabs,
+  value,
+  onChange,
+  className = "",
+}: {
+  tabs: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      role="tablist"
+      className={`inline-flex rounded-sm border border-line-2 bg-surface p-1 ${className}`}
+    >
+      {tabs.map((t) => (
+        <button
+          key={t.value}
+          type="button"
+          role="tab"
+          aria-selected={value === t.value}
+          onClick={() => onChange(t.value)}
+          className={`h-9 rounded-xs px-4 text-[13.5px] font-semibold transition-colors ${
+            value === t.value ? "bg-ink text-on-carbon" : "text-ink-2 hover:text-ink"
+          }`}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function ProgressBar({ pct }: { pct: number }) {
   const v = Math.max(0, Math.min(100, pct));
   return (

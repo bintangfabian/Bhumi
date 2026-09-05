@@ -127,6 +127,43 @@ function currentStageIndex(stages: { duration_days: number }[], day: number) {
   return Math.max(0, stages.length - 1);
 }
 
+/**
+ * Tugas harian dibuat sekali per tanaman per hari, dari `stage_daily_tasks`
+ * tahap yang sedang aktif. Dipanggil lazily (dari getDashboard) sehingga
+ * tanaman baru (onboarding) maupun hari-hari berikutnya untuk tanaman lama
+ * selalu punya tugas tanpa perlu cron terpisah.
+ */
+export async function ensureTodayTasks(plantId: number, packId: string, plantedOn: Date) {
+  const today = todayStart();
+  const todayStr = ymd(today);
+
+  const [existing] = await pool.query<RowDataPacket[]>(
+    "SELECT 1 AS x FROM plant_tasks WHERE plant_id = ? AND task_date = ? LIMIT 1",
+    [plantId, todayStr],
+  );
+  if (existing[0]) return;
+
+  const stages = await getPackStages(packId);
+  if (stages.length === 0) return;
+
+  const total = stages.reduce((n, s) => n + s.duration_days, 0);
+  const rawDay = Math.floor((today.getTime() - plantedOn.getTime()) / 86400000) + 1;
+  const day = Math.min(Math.max(1, rawDay), total);
+  const idx = currentStageIndex(stages, day);
+  const stageId = stages[idx].id;
+
+  const [dailyTasks] = await pool.query<RowDataPacket[]>(
+    "SELECT id, title, when_label, sort_order FROM stage_daily_tasks WHERE stage_id = ? ORDER BY sort_order",
+    [stageId],
+  );
+  for (const t of dailyTasks) {
+    await pool.query(
+      "INSERT INTO plant_tasks (plant_id, task_date, title, when_label, sort_order, source_task_id) VALUES (?,?,?,?,?,?)",
+      [plantId, todayStr, t.title, t.when_label, t.sort_order, t.id],
+    );
+  }
+}
+
 async function buildStageUnlock(
   plantId: number,
   plantName: string,
@@ -197,12 +234,25 @@ export type DashboardPlant = {
   pct: number;
 };
 
+export type TaskStep = { title: string; body: string };
+
+export type TaskDetail = {
+  intro: string;
+  warning: string;
+  dos: { label: string; photo: string } | null;
+  donts: { label: string; photo: string } | null;
+  steps: TaskStep[];
+};
+
 export type DashboardTask = {
   id: number;
   title: string;
   plant: string;
+  plantId: number;
   when: string;
   done: boolean;
+  /** Konten kartu tugas kaya, kalau tugas ini digenerate dari template beranotasi. */
+  detail: TaskDetail | null;
 };
 
 export type Dashboard = {
@@ -238,6 +288,9 @@ export async function getDashboard(userId: number, userName: string): Promise<Da
   for (const p of plantRows) {
     const stages = await getPackStages(p.pack_id);
     if (stages.length === 0) continue;
+
+    const plantedOnForTasks = new Date(`${p.planted_on}T00:00:00`);
+    await ensureTodayTasks(p.id, p.pack_id, plantedOnForTasks);
 
     const total = stages.reduce((n, s) => n + s.duration_days, 0);
     const plantedOn = new Date(`${p.planted_on}T00:00:00`);
@@ -284,17 +337,43 @@ export async function getDashboard(userId: number, userName: string): Promise<Da
   }
 
   const [taskRows] = await pool.query<RowDataPacket[]>(
-    `SELECT pt.id, pt.title, pt.when_label, pt.done_at, p.name AS plant_name
+    `SELECT pt.id, pt.title, pt.when_label, pt.done_at, pt.source_task_id, p.id AS plant_id, p.name AS plant_name
      FROM plant_tasks pt JOIN plants p ON p.id = pt.plant_id
      WHERE p.user_id = ? AND pt.task_date = ? ORDER BY p.id, pt.sort_order`,
     [userId, ymd(today)],
   );
+  const sourceIds = [...new Set(taskRows.map((t) => t.source_task_id).filter(Boolean))];
+  const detailById = new Map<number, TaskDetail>();
+  if (sourceIds.length > 0) {
+    const [srcRows] = await pool.query<RowDataPacket[]>(
+      `SELECT id, intro, warning, dos_label, dos_photo_url, donts_label, donts_photo_url
+       FROM stage_daily_tasks WHERE id IN (?)`,
+      [sourceIds],
+    );
+    const [stepRows] = await pool.query<RowDataPacket[]>(
+      "SELECT task_id, title, body FROM stage_daily_task_steps WHERE task_id IN (?) ORDER BY sort_order",
+      [sourceIds],
+    );
+    for (const s of srcRows) {
+      const hasContent = s.intro || s.warning || s.dos_photo_url || s.donts_photo_url;
+      if (!hasContent) continue;
+      detailById.set(s.id, {
+        intro: s.intro ?? "",
+        warning: s.warning ?? "",
+        dos: s.dos_photo_url ? { label: s.dos_label, photo: s.dos_photo_url } : null,
+        donts: s.donts_photo_url ? { label: s.donts_label, photo: s.donts_photo_url } : null,
+        steps: stepRows.filter((r) => r.task_id === s.id).map((r) => ({ title: r.title, body: r.body })),
+      });
+    }
+  }
   const tasks: DashboardTask[] = taskRows.map((t) => ({
     id: t.id,
     title: t.title,
     plant: t.plant_name,
+    plantId: t.plant_id,
     when: t.when_label,
     done: !!t.done_at,
+    detail: t.source_task_id ? (detailById.get(t.source_task_id) ?? null) : null,
   }));
 
   const [reminderRows] = await pool.query<RowDataPacket[]>(
@@ -422,6 +501,7 @@ export type GuideData = {
   stages: GuideStageData[];
   journal: { id: number; date: string; text: string; photo: string | null }[];
   progressPhotos: { date: string; photo: string }[];
+  badges: MilestoneBadge[];
 };
 
 export async function getGuide(userId: number, plantId: number): Promise<GuideData | null> {
@@ -511,6 +591,8 @@ export async function getGuide(userId: number, plantId: number): Promise<GuideDa
     photo: p.photo_url,
   }));
 
+  const badges = await computeBadges(userId);
+
   return {
     plantId: plant.id,
     plant: plant.name,
@@ -520,5 +602,6 @@ export async function getGuide(userId: number, plantId: number): Promise<GuideDa
     stages,
     journal,
     progressPhotos,
+    badges,
   };
 }

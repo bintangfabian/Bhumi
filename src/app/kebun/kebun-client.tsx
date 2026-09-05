@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { photo } from "@/lib/data";
@@ -11,11 +11,12 @@ import {
   HealthChip,
   StageUnlockSheet,
   StreakCard,
+  TaskDetailCard,
   TaskRow,
   WeeklyChallengeCard,
 } from "@/components/gamification";
 import type { Dashboard } from "@/lib/repo/garden";
-import { markStageSeenAction, toggleTaskAction } from "./actions";
+import { addProgressPhotoAction, markStageSeenAction, toggleTaskAction } from "./actions";
 
 export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
   const router = useRouter();
@@ -24,6 +25,10 @@ export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
     dashboard.tasks.filter((t) => t.done).map((t) => t.id),
   );
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [taskFilter, setTaskFilter] = useState<number | "all">("all");
+  const [photoBusyPlantId, setPhotoBusyPlantId] = useState<number | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const uploadTargetRef = useRef<number | null>(null);
   // The server's streak already counts today if it was fully done on load;
   // only bump the ring preview when the user just now finishes the last task.
   const [wasAllDoneOnLoad] = useState(
@@ -68,6 +73,39 @@ export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
     return nextLocked ? [...unlocked, nextLocked] : unlocked;
   })();
   const newBadge = dashboard.badges.find((b) => b.state === "new");
+
+  const filteredTasks = useMemo(
+    () => (taskFilter === "all" ? dashboard.tasks : dashboard.tasks.filter((t) => t.plantId === taskFilter)),
+    [dashboard.tasks, taskFilter],
+  );
+  const featuredTask = useMemo(
+    () => filteredTasks.find((t) => !done.includes(t.id) && t.detail),
+    [filteredTasks, done],
+  );
+  const restTasks = filteredTasks.filter((t) => t.id !== featuredTask?.id);
+
+  function triggerPhotoUpload(plantId: number) {
+    uploadTargetRef.current = plantId;
+    fileRef.current?.click();
+  }
+
+  async function handlePhotoSelected(file: File) {
+    const plantId = uploadTargetRef.current;
+    if (!plantId) return;
+    setPhotoBusyPlantId(plantId);
+    try {
+      const fd = new FormData();
+      fd.set("photo", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        await addProgressPhotoAction(plantId, data.url);
+        router.refresh();
+      }
+    } finally {
+      setPhotoBusyPlantId(null);
+    }
+  }
 
   return (
     <Container className="py-10 lg:py-14">
@@ -235,34 +273,66 @@ export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
         {/* ---------------- Right column ---------------- */}
         <div className="contents lg:block lg:space-y-5">
           {/* 2 · Today's tasks */}
-          <section className="order-2 overflow-hidden rounded-lg border border-ink bg-surface">
-            <div className="flex items-baseline justify-between border-b border-line px-5 py-4 sm:px-6">
-              <h2 className="text-[17px]">Tugas hari ini</h2>
-              <span className="font-mono text-[12px] text-ink-3">
-                {done.length}/{dashboard.tasks.length}
-              </span>
-            </div>
-            <div className="px-5 sm:px-6">
-              {dashboard.tasks.length === 0 && (
-                <p className="py-6 text-[14px] text-ink-2">Tidak ada tugas terjadwal hari ini.</p>
-              )}
-              {dashboard.tasks.map((t) => (
-                <TaskRow
-                  key={t.id}
-                  title={t.title}
-                  meta={`${t.plant} · ${t.when}`}
-                  done={done.includes(t.id)}
-                  onToggle={() => toggle(t.id)}
-                />
-              ))}
-            </div>
-            {dashboard.tasks.length > 0 && (
-              <div className="border-t border-line bg-page px-5 py-4 font-mono text-[11px] font-medium uppercase leading-relaxed tracking-[0.14em] text-ink-3 sm:px-6">
-                {allDone
-                  ? `Hari ke-${streakDays} tercatat. Sampai besok pagi.`
-                  : `Selesaikan ${pending} lagi untuk hari ke-${dashboard.streak.days + 1}`}
-              </div>
+          <section className="order-2 space-y-3">
+            {dashboard.plants.length > 1 && (
+              <label className="flex items-center justify-end gap-2 text-[12.5px] text-ink-3">
+                Tanaman
+                <select
+                  value={taskFilter}
+                  onChange={(e) => setTaskFilter(e.target.value === "all" ? "all" : Number(e.target.value))}
+                  className="h-8 border border-line-2 bg-surface px-2 text-[12.5px] font-medium text-ink"
+                >
+                  <option value="all">Semua tanaman</option>
+                  {dashboard.plants.map((pl) => (
+                    <option key={pl.id} value={pl.id}>
+                      {pl.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
             )}
+
+            {featuredTask && (
+              <TaskDetailCard
+                title={featuredTask.title}
+                meta={`${featuredTask.plant} · ${featuredTask.when}`}
+                done={done.includes(featuredTask.id)}
+                onToggle={() => toggle(featuredTask.id)}
+                detail={featuredTask.detail!}
+                onAddPhoto={() => triggerPhotoUpload(featuredTask.plantId)}
+                photoBusy={photoBusyPlantId === featuredTask.plantId}
+              />
+            )}
+
+            <div className="overflow-hidden rounded-lg border border-ink bg-surface">
+              <div className="flex items-baseline justify-between border-b border-line px-5 py-4 sm:px-6">
+                <h2 className="text-[17px]">{featuredTask ? "Tugas lainnya" : "Tugas hari ini"}</h2>
+                <span className="font-mono text-[12px] text-ink-3">
+                  {done.length}/{dashboard.tasks.length}
+                </span>
+              </div>
+              <div className="px-5 sm:px-6">
+                {filteredTasks.length === 0 && (
+                  <p className="py-6 text-[14px] text-ink-2">Tidak ada tugas terjadwal hari ini.</p>
+                )}
+                {restTasks.map((t) => (
+                  <TaskRow
+                    key={t.id}
+                    title={t.title}
+                    meta={`${t.plant} · ${t.when}`}
+                    done={done.includes(t.id)}
+                    onToggle={() => toggle(t.id)}
+                  />
+                ))}
+              </div>
+              {dashboard.tasks.length > 0 && (
+                <div className="border-t border-line bg-page px-5 py-4 font-mono text-[11px] font-medium uppercase leading-relaxed tracking-[0.14em] text-ink-3 sm:px-6">
+                  {allDone
+                    ? `Hari ke-${streakDays} tercatat. Sampai besok pagi.`
+                    : `Selesaikan ${pending} lagi untuk hari ke-${dashboard.streak.days + 1}`}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* 4 · Reminders */}
@@ -300,6 +370,18 @@ export function KebunClient({ dashboard }: { dashboard: Dashboard }) {
       {dashboard.stageUnlock && (
         <StageUnlockSheet data={dashboard.stageUnlock} open={sheetOpen} onClose={closeSheet} />
       )}
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handlePhotoSelected(f);
+          e.target.value = "";
+        }}
+      />
     </Container>
   );
 }
